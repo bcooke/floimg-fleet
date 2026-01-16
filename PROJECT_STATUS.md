@@ -7,58 +7,50 @@
 
 ## Current Focus
 
-**Active Task**: [[T-2026-001-setup-elixir-phoenix-project]]
-**Branch**: feat/T-2026-001-setup-elixir-phoenix
-**Goal**: Initialize Elixir/Phoenix project for bot orchestration
+**Active Task**: None - ready for next task
+**Branch**: main
+**Goal**: Bot orchestration foundation complete
 
 ---
 
 ## Recently Completed (Last 3)
 
-- None yet (new project)
+- **T-2026-001** - Set up Elixir/Phoenix project with CQRS architecture
 
 ---
 
 ## Next Up (Top 3 Priorities)
 
-1. **T-2026-001** - Set up Elixir/Phoenix project structure
-2. Bot supervisor and GenServer architecture
-3. FloImg API client implementation
+1. **Admin Panel LiveView** - Bot management dashboard (start/pause/resume)
+2. **FloImg API Client** - Req-based client for FloImg endpoints
+3. **Bot Brain (LLM)** - LLM integration for personality and decisions
 
 ---
 
 ## Open Questions / Blockers
 
-- LLM provider selection for bot personalities
+- LLM provider selection for bot personalities (OpenAI, Anthropic, Ollama?)
 - FloImg API authentication strategy for bots
-- Database choice for bot state persistence
 
 ---
 
 ## Key Decisions
 
-- **Stack**: Elixir/Phoenix for concurrent bot orchestration
-- **Architecture**: GenServer per bot, supervised by bot supervisor
-- **API Strategy**: Direct API calls preferred, Playwright fallback for browser simulation
+- **Stack**: Elixir 1.18 / Phoenix 1.8 / OTP 28
+- **Database**: PostgreSQL with Ecto (binary_id)
+- **Architecture**: CQRS pattern with GenServer per bot
+- **Deployment**: Docker on Coolify (Hetzner)
 
 ---
 
-## Files Recently Modified
+## What's Been Built
 
-<!-- Auto-updated by post-commit hook -->
-- Initial project setup from Balustrade template
-
----
-
-## Task Breakdown (Active Task)
-
-**T-2026-001**: Set Up FloImg Fleet Elixir/Phoenix Project
-- [ ] Initialize Elixir/Phoenix project
-- [ ] Configure project structure
-- [ ] Set up supervision tree
-- [ ] Add dependencies
-- [ ] Create documentation
-- [ ] Clean up example files
+- CQRS context (`FloimgFleet.Bots`) with commands/queries/schemas
+- `Bot` and `BotActivity` schemas with migrations
+- `BotSupervisor` (DynamicSupervisor) and `BotAgent` (GenServer)
+- Dockerfile + docker-compose for deployment
+- Health check endpoint at `/health`
+- Full architecture documentation
 
 ---
 
