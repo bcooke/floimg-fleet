@@ -27,6 +27,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   alias FloimgFleet.Bots
   alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.FloImgAPI
 
   require Logger
 
@@ -96,10 +97,13 @@ defmodule FloimgFleet.Runtime.BotAgent do
   def handle_info(:post, %{bot: bot} = state) do
     broadcast(:action, "Creating a new post...", bot)
 
-    # TODO: Implement actual posting logic via FloImg API
-    # For now, just simulate
-    Process.sleep(Enum.random(1_000..3_000))
-    broadcast(:post, "Posted a new image!", bot)
+    case do_post(bot) do
+      {:ok, post} ->
+        broadcast(:post, "Posted a new image: #{post["caption"] || "untitled"}", bot)
+
+      {:error, reason} ->
+        broadcast(:error, "Failed to post: #{inspect(reason)}", bot)
+    end
 
     schedule_next_action(bot)
     {:noreply, %{state | last_action: :post}}
@@ -108,9 +112,16 @@ defmodule FloimgFleet.Runtime.BotAgent do
   def handle_info(:comment, %{bot: bot} = state) do
     broadcast(:action, "Looking for something to comment on...", bot)
 
-    # TODO: Implement actual commenting logic
-    Process.sleep(Enum.random(500..2_000))
-    broadcast(:comment, "Left a comment!", bot)
+    case do_comment(bot) do
+      {:ok, _comment} ->
+        broadcast(:comment, "Left a comment!", bot)
+
+      {:error, :no_posts} ->
+        broadcast(:thought, "Nothing to comment on", bot)
+
+      {:error, reason} ->
+        broadcast(:error, "Failed to comment: #{inspect(reason)}", bot)
+    end
 
     schedule_next_action(bot)
     {:noreply, %{state | last_action: :comment}}
@@ -119,9 +130,16 @@ defmodule FloimgFleet.Runtime.BotAgent do
   def handle_info(:like, %{bot: bot} = state) do
     broadcast(:action, "Scrolling the feed...", bot)
 
-    # TODO: Implement actual liking logic
-    Process.sleep(Enum.random(300..1_000))
-    broadcast(:like, "Liked a post!", bot)
+    case do_like(bot) do
+      {:ok, _result} ->
+        broadcast(:like, "Liked a post!", bot)
+
+      {:error, :no_posts} ->
+        broadcast(:thought, "Nothing to like", bot)
+
+      {:error, reason} ->
+        broadcast(:error, "Failed to like: #{inspect(reason)}", bot)
+    end
 
     schedule_next_action(bot)
     {:noreply, %{state | last_action: :like}}
@@ -129,6 +147,15 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   def handle_info(:browse, %{bot: bot} = state) do
     broadcast(:thought, "Just browsing...", bot)
+
+    case do_browse(bot) do
+      {:ok, posts} ->
+        count = length(posts["posts"] || [])
+        broadcast(:thought, "Found #{count} posts in feed", bot)
+
+      {:error, _reason} ->
+        :ok
+    end
 
     schedule_next_action(bot)
     {:noreply, %{state | last_action: :browse}}
@@ -168,6 +195,96 @@ defmodule FloimgFleet.Runtime.BotAgent do
   def terminate(_reason, %{bot: bot}) do
     update_bot_status(bot, :idle, nil)
     :ok
+  end
+
+  # ============================================================================
+  # API Actions
+  # ============================================================================
+
+  defp do_post(bot) do
+    # Generate a post with random image and caption
+    # In a real implementation, this would use an LLM to generate content
+    attrs = %{
+      image_url: generate_placeholder_image(),
+      caption: generate_caption(bot)
+    }
+
+    FloImgAPI.create_post(bot, attrs)
+  end
+
+  defp do_comment(bot) do
+    # Get feed, pick a random post, leave a comment
+    case FloImgAPI.get_feed(bot, per_page: 20) do
+      {:ok, %{"posts" => posts}} when posts != [] ->
+        post = Enum.random(posts)
+        comment = generate_comment(bot, post)
+        FloImgAPI.add_comment(bot, post["id"], comment)
+
+      {:ok, _} ->
+        {:error, :no_posts}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp do_like(bot) do
+    # Get feed, pick a random post, like it
+    case FloImgAPI.get_feed(bot, per_page: 20) do
+      {:ok, %{"posts" => posts}} when posts != [] ->
+        post = Enum.random(posts)
+        FloImgAPI.like_post(bot, post["id"])
+
+      {:ok, _} ->
+        {:error, :no_posts}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp do_browse(bot) do
+    FloImgAPI.get_feed(bot, per_page: 20)
+  end
+
+  defp generate_placeholder_image do
+    # Generate a placeholder image URL
+    # In production, this would be an actual generated image
+    width = Enum.random([512, 768, 1024])
+    height = Enum.random([512, 768, 1024])
+    "https://picsum.photos/#{width}/#{height}"
+  end
+
+  defp generate_caption(bot) do
+    # Simple caption generation based on bot personality
+    # In production, this would use an LLM
+    captions = [
+      "Check out what I made! 🎨",
+      "Just experimenting with some new ideas",
+      "Love how this turned out",
+      "Playing around with different styles",
+      "What do you think?",
+      "#{bot.vibe || "Feeling creative"} vibes today ✨"
+    ]
+
+    Enum.random(captions)
+  end
+
+  defp generate_comment(bot, _post) do
+    # Simple comment generation
+    # In production, this would use an LLM to generate contextual comments
+    comments = [
+      "This is amazing! 🔥",
+      "Love the style!",
+      "Great work!",
+      "So creative!",
+      "Wow, this is cool",
+      "Really nice composition",
+      "The colors are perfect",
+      "#{bot.vibe || "Nice"} 👏"
+    ]
+
+    Enum.random(comments)
   end
 
   # ============================================================================

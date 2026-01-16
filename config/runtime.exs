@@ -20,6 +20,11 @@ if System.get_env("PHX_SERVER") do
   config :floimg_fleet, FloimgFleetWeb.Endpoint, server: true
 end
 
+# FloImg API client configuration
+config :floimg_fleet, FloimgFleet.FloImgAPI,
+  base_url: System.get_env("FLOIMG_API_URL") || "https://api.floimg.com",
+  bot_secret: System.get_env("FLOIMG_BOT_SECRET")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
