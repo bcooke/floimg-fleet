@@ -7,8 +7,8 @@
 
 ## Current Focus
 
-**Active Task**: [No active task - use /s T-2026-001 to start]
-**Branch**: main
+**Active Task**: [[T-2026-001-setup-elixir-phoenix-project]]
+**Branch**: feat/T-2026-001-setup-elixir-phoenix
 **Goal**: Initialize Elixir/Phoenix project for bot orchestration
 
 ---
