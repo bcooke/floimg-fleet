@@ -3,7 +3,7 @@ type: task
 id: T-2026-003
 story:
 epic:
-status: in-progress
+status: completed
 priority: high
 created: 2026-01-15
 updated: 2026-01-15
@@ -15,12 +15,12 @@ updated: 2026-01-15
 **Task ID**: T-2026-003-floimg-api-client
 **Story**: N/A
 **Epic**: N/A
-**Status**: In Progress
+**Status**: Completed
 **Priority**: High
 **Branch**: feat/T-2026-003-floimg-api-client
 **Created**: 2026-01-15
 **Started**: 2026-01-15
-**Completed**:
+**Completed**: 2026-01-15
 
 ## Description
 Create an HTTP client module for bots to interact with the FloImg gallery API. This client will be used by BotAgent to perform actual actions like posting images, liking content, leaving comments, and browsing the gallery.
@@ -28,13 +28,13 @@ Create an HTTP client module for bots to interact with the FloImg gallery API. T
 The API endpoints don't fully exist yet, so this will define the expected interface that FloImg's API should implement.
 
 ## Checklist
-- [ ] Create `FloimgFleet.FloImgAPI` module with Req-based HTTP client
-- [ ] Implement gallery endpoints (list, get, create post)
-- [ ] Implement interaction endpoints (like, comment)
-- [ ] Implement browse/discover endpoints
-- [ ] Add authentication handling (bot tokens)
-- [ ] Wire up BotAgent to use the API client
-- [ ] Add configuration for API base URL and credentials
+- [x] Create `FloimgFleet.FloImgAPI` module with Req-based HTTP client
+- [x] Implement gallery endpoints (list, get, create post)
+- [x] Implement interaction endpoints (like, comment)
+- [x] Implement browse/discover endpoints
+- [x] Add authentication handling (bot tokens)
+- [x] Wire up BotAgent to use the API client
+- [x] Add configuration for API base URL and credentials
 
 ## Technical Details
 ### Approach

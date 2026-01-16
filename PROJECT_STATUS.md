@@ -7,14 +7,15 @@
 
 ## Current Focus
 
-**Active Task**: [[T-2026-003-floimg-api-client]]
-**Branch**: feat/T-2026-003-floimg-api-client
-**Goal**: HTTP client for bots to interact with FloImg gallery API
+**Active Task**: None - ready for next task
+**Branch**: main
+**Goal**: API client complete, ready for real API integration
 
 ---
 
 ## Recently Completed (Last 3)
 
+- **T-2026-003** - FloImg API Client for bot interactions
 - **T-2026-002** - Admin Panel LiveView with bot management dashboard
 - **T-2026-001** - Set up Elixir/Phoenix project with CQRS architecture
 
@@ -22,16 +23,16 @@
 
 ## Next Up (Top 3 Priorities)
 
-1. **FloImg API Client** - Req-based client for FloImg endpoints
-2. **Bot Brain (LLM)** - LLM integration for personality and decisions
-3. **Bot Actions** - Implement actual post/comment/like behaviors
+1. **Bot Brain (LLM)** - LLM integration for personality and content generation
+2. **Real API Integration** - Connect to actual FloImg API endpoints
+3. **Activity Logging** - Persist bot activities to database
 
 ---
 
 ## Open Questions / Blockers
 
 - LLM provider selection for bot personalities (OpenAI, Anthropic, Ollama?)
-- FloImg API authentication strategy for bots
+- FloImg API endpoints need to be built to match expected interface
 
 ---
 
@@ -52,6 +53,8 @@
 - LiveView admin panel with real-time updates
 - Start/pause/resume controls for individual and bulk operations
 - Real-time activity feed via PubSub
+- **FloImg API client** with gallery and interaction endpoints
+- BotAgent wired to API client for post/comment/like/browse
 - Dockerfile + docker-compose for deployment
 - Health check endpoint at `/health`
 
