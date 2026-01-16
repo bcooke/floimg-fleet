@@ -1,0 +1,65 @@
+# Balustrade Template .gitignore
+
+# Reference materials (cloned repos, screenshots, PRDs, PDFs, external docs)
+# Use underscore prefix for any ignored directories
+_reference/
+
+# Claude Code local data
+.claude/settings.local.json
+.claude-sessions/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Dependencies (add your language's dependencies)
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+target/
+Cargo.lock
+.bundle/
+
+# Build outputs (customize for your stack)
+dist/
+build/
+*.out
+*.exe
+*.so
+*.dylib
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pip-log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Testing
+coverage/
+.nyc_output/
+*.test.cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak

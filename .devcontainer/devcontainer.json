@@ -1,0 +1,16 @@
+{
+  "name": "balustrade",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code"
+      ]
+    }
+  },
+
+  "postCreateCommand": "bash .claude/hooks/install-hooks.sh",
+
+  "remoteUser": "vscode"
+}
