@@ -8,7 +8,7 @@
 ## Current Focus
 
 **Active Task**: [[T-2026-003-floimg-api-client]]
-**Branch**: (not started)
+**Branch**: feat/T-2026-003-floimg-api-client
 **Goal**: HTTP client for bots to interact with FloImg gallery API
 
 ---
