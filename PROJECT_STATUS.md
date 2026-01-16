@@ -1,62 +1,64 @@
 # Project Status
 
-**Last Updated**: YYYY-MM-DD
-**Project**: [Your Project Name]
+**Last Updated**: 2026-01-15
+**Project**: FloImg Fleet
 
 ---
 
 ## Current Focus
 
-**Active Task**: [No active task - use /s to start]
+**Active Task**: [No active task - use /s T-2026-001 to start]
 **Branch**: main
-**Goal**: [Current goal]
+**Goal**: Initialize Elixir/Phoenix project for bot orchestration
 
 ---
 
 ## Recently Completed (Last 3)
 
-- ✅ **TASK-ID** - [[Task Name]] - Brief description
-- ✅ **TASK-ID** - [[Task Name]] - Brief description
-- ✅ **TASK-ID** - [[Task Name]] - Brief description
+- None yet (new project)
 
 ---
 
 ## Next Up (Top 3 Priorities)
 
-1. [Priority 1 - What needs to be done next]
-2. [Priority 2 - Important follow-up work]
-3. [Priority 3 - Future consideration]
+1. **T-2026-001** - Set up Elixir/Phoenix project structure
+2. Bot supervisor and GenServer architecture
+3. FloImg API client implementation
 
 ---
 
 ## Open Questions / Blockers
 
-- [Question or blocker 1]
-- [Question or blocker 2]
+- LLM provider selection for bot personalities
+- FloImg API authentication strategy for bots
+- Database choice for bot state persistence
 
 ---
 
 ## Key Decisions
 
-- **Decision 1**: Description of key architectural or product decision
-- **Decision 2**: Description of key decision and why it was made
+- **Stack**: Elixir/Phoenix for concurrent bot orchestration
+- **Architecture**: GenServer per bot, supervised by bot supervisor
+- **API Strategy**: Direct API calls preferred, Playwright fallback for browser simulation
 
 ---
 
 ## Files Recently Modified
 
 <!-- Auto-updated by post-commit hook -->
-- [File paths will appear here automatically after commits]
+- Initial project setup from Balustrade template
 
 ---
 
 ## Task Breakdown (Active Task)
 
-**TASK-ID**: Task Name
-- [ ] Subtask 1
-- [ ] Subtask 2
-- [ ] Subtask 3
-- [ ] Subtask 4
+**T-2026-001**: Set Up FloImg Fleet Elixir/Phoenix Project
+- [ ] Initialize Elixir/Phoenix project
+- [ ] Configure project structure
+- [ ] Set up supervision tree
+- [ ] Add dependencies
+- [ ] Create documentation
+- [ ] Clean up example files
 
 ---
 
@@ -65,5 +67,3 @@
 - This file is the **single source of truth** for project status
 - Kept in sync with `vault/pm/` via hooks and slash commands
 - Read this file first before asking "what's the status?"
-- Token-efficient: ~500 tokens vs 5000+ for scanning vault
-- Auto-updated by hooks and commands - no manual maintenance required
