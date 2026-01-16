@@ -8,7 +8,8 @@
 import Config
 
 config :floimg_fleet,
-  generators: [timestamp_type: :utc_datetime]
+  ecto_repos: [FloimgFleet.Repo],
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
 config :floimg_fleet, FloimgFleetWeb.Endpoint,

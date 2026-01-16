@@ -60,7 +60,14 @@ defmodule FloimgFleet.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      # Database
+      {:ecto_sql, "~> 3.12"},
+      {:postgrex, "~> 0.19"},
+      # HTTP client for FloImg API
+      {:req, "~> 0.5"},
+      # For bot scheduling
+      {:oban, "~> 2.18"}
     ]
   end
 
@@ -72,7 +79,10 @@ defmodule FloimgFleet.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "assets.setup", "assets.build"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind floimg_fleet", "esbuild floimg_fleet"],
       "assets.deploy": [

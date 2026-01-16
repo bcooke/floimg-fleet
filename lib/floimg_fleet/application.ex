@@ -9,10 +9,12 @@ defmodule FloimgFleet.Application do
   def start(_type, _args) do
     children = [
       FloimgFleetWeb.Telemetry,
+      # Start the Ecto repository
+      FloimgFleet.Repo,
       {DNSCluster, query: Application.get_env(:floimg_fleet, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FloimgFleet.PubSub},
-      # Start a worker by calling: FloimgFleet.Worker.start_link(arg)
-      # {FloimgFleet.Worker, arg},
+      # Bot supervision will be added here:
+      # FloimgFleet.Runtime.BotSupervisor,
       # Start to serve requests, typically the last entry
       FloimgFleetWeb.Endpoint
     ]

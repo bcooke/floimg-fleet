@@ -1,47 +1,66 @@
-# Product Vision (Example: Todo App)
+# Product Vision
 
-**This is an example.** Replace with YOUR product vision.
+## What FloImg Fleet Is
 
----
-
-## What We're Building
-
-A simple todo application demonstrating Balustrade patterns.
+A bot orchestration system that simulates authentic user activity on FloImg Studio's gallery features. LLM-driven bots create, share, and interact with content to solve the cold-start problem for new social platforms.
 
 ## Why It Exists
 
-To show how product documentation works in the Balustrade meta-framework. This todo app has:
-- Clear product docs (this file)
-- Architecture decisions (separate file)
-- Feature specifications (separate file)
+New social platforms face a chicken-and-egg problem: users leave if there's no activity, but there's no activity without users. FloImg Fleet bootstraps engagement by populating the gallery with realistic content and interactions, making the platform feel alive to early adopters.
 
 ## Core Value
 
-Not the todo app itself - it's the **documentation patterns** that matter.
+**Authentic-feeling activity at scale.** Each bot has:
+- Unique personality and interests (LLM-generated)
+- Probabilistic behavior patterns
+- Natural timing variations
+- Human-like content creation
+
+## What Bots Do
+
+- Create and share images in the gallery
+- Upvote and interact with content
+- Leave contextual comments
+- Browse and discover content
+
+## What Bots Don't Do
+
+- Create plugins or templates
+- Make OSS contributions
+- Access admin features
+- Anything outside gallery/social features
 
 ## User Goals
 
-Users want to:
-- See examples of vault structure
-- Understand how to document their own product
-- Learn the pattern, then replace this with their vision
+**Platform operators** want:
+- Zero-maintenance bot population
+- Configurable activity levels
+- Real-time monitoring dashboard
+- Easy start/pause/stop controls
+
+**End users** (unknowingly) experience:
+- Active, engaging gallery
+- Interesting content to discover
+- Social proof through likes/comments
+- Motivation to create their own content
 
 ## Success Metrics
 
-Balustrade users successfully:
-- Delete this example
-- Add their own product vision
-- Follow the documentation patterns
-- Customize for their domain
+- Gallery feels active to new visitors
+- Bots are indistinguishable from real users
+- Minimal operational overhead
+- Cost-efficient LLM usage
 
----
+## Design Principles
 
-## For Your Project
+1. **Human-like behavior** - Randomized timing, varied actions, natural patterns
+2. **Cost efficiency** - Minimize LLM tokens and API calls
+3. **Observable** - Real-time dashboard for monitoring
+4. **Controllable** - Start, pause, resume individual bots or all at once
+5. **Resilient** - Bots recover from errors, supervisor restarts failed processes
 
-Replace this file with YOUR product vision:
-- What problem does your product solve?
-- Who are your users?
-- What's your unique value proposition?
-- What are your success metrics?
+## Related Documentation
 
-Keep it evergreen (no temporal language like "will", "soon", "recently").
+- [[System-Overview]] - Architecture deep dive
+- [[Bot-Schema]] - Database schema design
+- [[Admin-Panel]] - LiveView admin interface

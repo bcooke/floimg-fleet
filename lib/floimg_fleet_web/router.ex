@@ -20,10 +20,19 @@ defmodule FloimgFleetWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FloimgFleetWeb do
-  #   pipe_through :api
-  # end
+  # Health check endpoint (no auth required)
+  scope "/", FloimgFleetWeb do
+    pipe_through :api
+
+    get "/health", HealthController, :index
+  end
+
+  # API routes
+  scope "/api", FloimgFleetWeb do
+    pipe_through :api
+
+    # Bot management endpoints will go here
+  end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:floimg_fleet, :dev_routes) do
