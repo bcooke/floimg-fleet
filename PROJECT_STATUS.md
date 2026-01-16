@@ -8,7 +8,7 @@
 ## Current Focus
 
 **Active Task**: [[T-2026-002-admin-panel-liveview]]
-**Branch**: (not started)
+**Branch**: feat/T-2026-002-admin-panel-liveview
 **Goal**: LiveView admin panel for bot management
 
 ---

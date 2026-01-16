@@ -3,7 +3,7 @@ type: task
 id: T-2026-002
 story:
 epic:
-status: backlog
+status: in-progress
 priority: high
 created: 2026-01-15
 updated: 2026-01-15
@@ -15,11 +15,11 @@ updated: 2026-01-15
 **Task ID**: T-2026-002-admin-panel-liveview
 **Story**: N/A
 **Epic**: N/A
-**Status**: Backlog
+**Status**: In Progress
 **Priority**: High
 **Branch**: feat/T-2026-002-admin-panel-liveview
 **Created**: 2026-01-15
-**Started**:
+**Started**: 2026-01-15
 **Completed**:
 
 ## Description
