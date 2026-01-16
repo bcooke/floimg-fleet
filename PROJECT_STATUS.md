@@ -7,23 +7,24 @@
 
 ## Current Focus
 
-**Active Task**: [[T-2026-002-admin-panel-liveview]]
-**Branch**: feat/T-2026-002-admin-panel-liveview
-**Goal**: LiveView admin panel for bot management
+**Active Task**: None - ready for next task
+**Branch**: main
+**Goal**: Admin panel complete, ready for API integration
 
 ---
 
 ## Recently Completed (Last 3)
 
+- **T-2026-002** - Admin Panel LiveView with bot management dashboard
 - **T-2026-001** - Set up Elixir/Phoenix project with CQRS architecture
 
 ---
 
 ## Next Up (Top 3 Priorities)
 
-1. **Admin Panel LiveView** - Bot management dashboard (start/pause/resume)
-2. **FloImg API Client** - Req-based client for FloImg endpoints
-3. **Bot Brain (LLM)** - LLM integration for personality and decisions
+1. **FloImg API Client** - Req-based client for FloImg endpoints
+2. **Bot Brain (LLM)** - LLM integration for personality and decisions
+3. **Bot Actions** - Implement actual post/comment/like behaviors
 
 ---
 
@@ -48,9 +49,11 @@
 - CQRS context (`FloimgFleet.Bots`) with commands/queries/schemas
 - `Bot` and `BotActivity` schemas with migrations
 - `BotSupervisor` (DynamicSupervisor) and `BotAgent` (GenServer)
+- LiveView admin panel with real-time updates
+- Start/pause/resume controls for individual and bulk operations
+- Real-time activity feed via PubSub
 - Dockerfile + docker-compose for deployment
 - Health check endpoint at `/health`
-- Full architecture documentation
 
 ---
 
