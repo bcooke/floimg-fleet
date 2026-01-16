@@ -1,0 +1,33 @@
+defmodule FloimgFleet.Application do
+  # See https://hexdocs.pm/elixir/Application.html
+  # for more information on OTP Applications
+  @moduledoc false
+
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      FloimgFleetWeb.Telemetry,
+      {DNSCluster, query: Application.get_env(:floimg_fleet, :dns_cluster_query) || :ignore},
+      {Phoenix.PubSub, name: FloimgFleet.PubSub},
+      # Start a worker by calling: FloimgFleet.Worker.start_link(arg)
+      # {FloimgFleet.Worker, arg},
+      # Start to serve requests, typically the last entry
+      FloimgFleetWeb.Endpoint
+    ]
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: FloimgFleet.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  @impl true
+  def config_change(changed, _new, removed) do
+    FloimgFleetWeb.Endpoint.config_change(changed, removed)
+    :ok
+  end
+end
