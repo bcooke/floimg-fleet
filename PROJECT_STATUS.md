@@ -7,9 +7,9 @@
 
 ## Current Focus
 
-**Active Task**: None - ready for next task
-**Branch**: main
-**Goal**: Admin panel complete, ready for API integration
+**Active Task**: [[T-2026-003-floimg-api-client]]
+**Branch**: (not started)
+**Goal**: HTTP client for bots to interact with FloImg gallery API
 
 ---
 
