@@ -7,9 +7,9 @@
 
 ## Current Focus
 
-**Active Task**: None - ready for next task
-**Branch**: main
-**Goal**: Bot orchestration foundation complete
+**Active Task**: [[T-2026-002-admin-panel-liveview]]
+**Branch**: (not started)
+**Goal**: LiveView admin panel for bot management
 
 ---
 
