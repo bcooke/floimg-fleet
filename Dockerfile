@@ -49,12 +49,15 @@ COPY lib lib
 COPY priv priv
 COPY assets assets
 
-# Compile assets (Tailwind + esbuild via Mix tasks)
-RUN mix assets.deploy
-
-# Compile application
+# Copy runtime config (needed for compile)
 COPY config/runtime.exs config/
+
+# Compile application FIRST (required for Phoenix LiveView colocated hooks)
 RUN mix compile
+
+# Then compile assets (Tailwind + esbuild via Mix tasks)
+# This must happen AFTER mix compile so phoenix-colocated hooks are extracted
+RUN mix assets.deploy
 
 # Copy release configuration
 COPY rel rel
