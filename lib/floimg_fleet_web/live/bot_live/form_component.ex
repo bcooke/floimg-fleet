@@ -12,160 +12,122 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
 
       <.form for={@form} id="bot-form" phx-target={@myself} phx-change="validate" phx-submit="save">
         <div class="space-y-4">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Name</span>
-            </label>
-            <input
-              type="text"
-              name={@form[:name].name}
-              value={@form[:name].value}
-              class={["input input-bordered", @form[:name].errors != [] && "input-error"]}
-              placeholder="Bot name"
-            />
-            <label :if={@form[:name].errors != []} class="label">
-              <span class="label-text-alt text-error">
-                {Enum.map_join(@form[:name].errors, ", ", &translate_error/1)}
-              </span>
-            </label>
-          </div>
+          <.input
+            field={@form[:name]}
+            type="text"
+            label="Name"
+            placeholder="Bot name"
+            class="input input-bordered w-full"
+            error_class="input-error"
+          />
 
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Username</span>
-            </label>
-            <input
-              type="text"
-              name={@form[:username].name}
-              value={@form[:username].value}
-              class={["input input-bordered", @form[:username].errors != [] && "input-error"]}
-              placeholder="@username"
-            />
-            <label :if={@form[:username].errors != []} class="label">
-              <span class="label-text-alt text-error">
-                {Enum.map_join(@form[:username].errors, ", ", &translate_error/1)}
-              </span>
-            </label>
-          </div>
+          <.input
+            field={@form[:username]}
+            type="text"
+            label="Username"
+            placeholder="@username"
+            class="input input-bordered w-full"
+            error_class="input-error"
+          />
 
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Personality</span>
-            </label>
-            <textarea
-              name={@form[:personality].name}
-              class="textarea textarea-bordered"
-              placeholder="Describe the bot's personality..."
-              rows="3"
-            >{@form[:personality].value}</textarea>
-          </div>
+          <.input
+            field={@form[:personality]}
+            type="textarea"
+            label="Personality"
+            placeholder="Describe the bot's personality..."
+            rows="3"
+            class="textarea textarea-bordered w-full"
+          />
 
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Vibe</span>
-            </label>
-            <input
-              type="text"
-              name={@form[:vibe].name}
-              value={@form[:vibe].value}
-              class="input input-bordered"
-              placeholder="e.g., chill, enthusiastic, professional"
-            />
-          </div>
+          <.input
+            field={@form[:vibe]}
+            type="text"
+            label="Vibe"
+            placeholder="e.g., chill, enthusiastic, professional"
+            class="input input-bordered w-full"
+          />
 
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Interests</span>
+          <div class="fieldset mb-2">
+            <label>
+              <span class="label mb-1">Interests</span>
+              <input
+                type="text"
+                name={@form[:interests].name}
+                value={interests_to_string(@form[:interests].value)}
+                class="input input-bordered w-full"
+                placeholder="e.g., photography, travel, nature (comma-separated)"
+              />
             </label>
-            <input
-              type="text"
-              name={@form[:interests].name}
-              value={interests_to_string(@form[:interests].value)}
-              class="input input-bordered"
-              placeholder="e.g., photography, travel, nature (comma-separated)"
-            />
-            <label class="label">
-              <span class="label-text-alt text-base-content/60">Separate interests with commas</span>
-            </label>
+            <p class="text-sm text-base-content/60 mt-1">Separate interests with commas</p>
           </div>
 
           <div class="divider">Behavior Settings</div>
 
           <div class="grid grid-cols-3 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Post %</span>
+            <div class="fieldset mb-2">
+              <label>
+                <span class="label mb-1">Post %</span>
+                <input
+                  type="number"
+                  name={@form[:post_probability].name}
+                  value={to_percent(@form[:post_probability].value)}
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="input input-bordered w-full"
+                />
               </label>
-              <input
-                type="number"
-                name={@form[:post_probability].name}
-                value={to_percent(@form[:post_probability].value)}
-                min="0"
-                max="100"
-                step="5"
-                class="input input-bordered"
-              />
             </div>
 
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Comment %</span>
+            <div class="fieldset mb-2">
+              <label>
+                <span class="label mb-1">Comment %</span>
+                <input
+                  type="number"
+                  name={@form[:comment_probability].name}
+                  value={to_percent(@form[:comment_probability].value)}
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="input input-bordered w-full"
+                />
               </label>
-              <input
-                type="number"
-                name={@form[:comment_probability].name}
-                value={to_percent(@form[:comment_probability].value)}
-                min="0"
-                max="100"
-                step="5"
-                class="input input-bordered"
-              />
             </div>
 
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Like %</span>
+            <div class="fieldset mb-2">
+              <label>
+                <span class="label mb-1">Like %</span>
+                <input
+                  type="number"
+                  name={@form[:like_probability].name}
+                  value={to_percent(@form[:like_probability].value)}
+                  min="0"
+                  max="100"
+                  step="5"
+                  class="input input-bordered w-full"
+                />
               </label>
-              <input
-                type="number"
-                name={@form[:like_probability].name}
-                value={to_percent(@form[:like_probability].value)}
-                min="0"
-                max="100"
-                step="5"
-                class="input input-bordered"
-              />
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Min Interval (seconds)</span>
-              </label>
-              <input
-                type="number"
-                name={@form[:min_action_interval_seconds].name}
-                value={@form[:min_action_interval_seconds].value}
-                min="10"
-                max="3600"
-                class="input input-bordered"
-              />
-            </div>
+            <.input
+              field={@form[:min_action_interval_seconds]}
+              type="number"
+              label="Min Interval (seconds)"
+              min="10"
+              max="3600"
+              class="input input-bordered w-full"
+            />
 
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Max Interval (seconds)</span>
-              </label>
-              <input
-                type="number"
-                name={@form[:max_action_interval_seconds].name}
-                value={@form[:max_action_interval_seconds].value}
-                min="10"
-                max="3600"
-                class="input input-bordered"
-              />
-            </div>
+            <.input
+              field={@form[:max_action_interval_seconds]}
+              type="number"
+              label="Max Interval (seconds)"
+              min="10"
+              max="3600"
+              class="input input-bordered w-full"
+            />
           </div>
         </div>
 
@@ -186,12 +148,15 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign_new(:form, fn ->
-       to_form(Bot.changeset(bot, %{}))
+       to_form(Bot.changeset(bot, %{}), as: :bot)
      end)}
   end
 
+  require Logger
+
   @impl true
   def handle_event("validate", %{"bot" => bot_params}, socket) do
+    Logger.info("VALIDATE event received: #{inspect(bot_params)}")
     bot_params = normalize_params(bot_params)
 
     changeset =
@@ -199,12 +164,18 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
       |> Bot.changeset(bot_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, form: to_form(changeset))}
+    {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
   end
 
   def handle_event("save", %{"bot" => bot_params}, socket) do
+    Logger.info("SAVE event received: #{inspect(bot_params)}")
     bot_params = normalize_params(bot_params)
     save_bot(socket, socket.assigns.action, bot_params)
+  end
+
+  def handle_event(event, params, socket) do
+    Logger.warning("UNKNOWN EVENT: #{event} - params: #{inspect(params)}")
+    {:noreply, socket}
   end
 
   defp save_bot(socket, :edit, bot_params) do
@@ -216,7 +187,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+        {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
     end
   end
 
@@ -229,7 +200,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+        {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
     end
   end
 
