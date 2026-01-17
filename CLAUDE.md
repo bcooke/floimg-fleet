@@ -158,6 +158,11 @@ docker run -p 4000:4000 \
 | `POOL_SIZE` | No | DB connection pool (default: 10) |
 | `FLOIMG_API_URL` | No | FloImg API endpoint (default: https://api.floimg.com) |
 | `FLOIMG_SERVICE_TOKEN` | Yes (prod) | Service token for FloImg API authentication (format: fst_...) |
+| `LLM_PROVIDER` | No | LLM provider: "ollama" or "openai" (default: "ollama") |
+| `OLLAMA_URL` | No | Ollama server URL (default: http://localhost:11434) |
+| `OLLAMA_MODEL` | No | Ollama model name (default: llama3.2) |
+| `OPENAI_API_KEY` | No* | OpenAI API key (*required if LLM_PROVIDER=openai) |
+| `OPENAI_MODEL` | No | OpenAI model (default: gpt-4o-mini) |
 
 ## Key Modules
 
@@ -168,6 +173,7 @@ docker run -p 4000:4000 \
 | `FloimgFleet.Bots.Schemas.BotActivity` | Ecto schema for activity logs |
 | `FloimgFleet.Runtime.BotSupervisor` | DynamicSupervisor for bot processes |
 | `FloimgFleet.Runtime.BotAgent` | GenServer for individual bot state |
+| `FloimgFleet.LLM.Client` | LLM client for generating bot content (Ollama/OpenAI) |
 
 ## Git Workflow
 
