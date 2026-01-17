@@ -60,7 +60,7 @@ defmodule FloimgFleet.FloImgAPI.Client do
   end
 
   defp build_headers(bot) do
-    bot_secret = config(:bot_secret)
+    service_token = config(:service_token)
 
     headers = [
       {"content-type", "application/json"},
@@ -68,13 +68,15 @@ defmodule FloimgFleet.FloImgAPI.Client do
       {"user-agent", "FloImgFleet/1.0"}
     ]
 
+    # Add service token authentication (full token, e.g., fst_floimg-fleet_...)
     headers =
-      if bot_secret do
-        [{"authorization", "Bearer bot_#{bot_secret}"} | headers]
+      if service_token do
+        [{"authorization", "Bearer #{service_token}"} | headers]
       else
         headers
       end
 
+    # Add bot ID header so the API knows which bot is making the request
     if bot do
       [{"x-bot-id", bot.id} | headers]
     else

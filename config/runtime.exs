@@ -23,7 +23,7 @@ end
 # FloImg API client configuration
 config :floimg_fleet, FloimgFleet.FloImgAPI,
   base_url: System.get_env("FLOIMG_API_URL") || "https://api.floimg.com",
-  bot_secret: System.get_env("FLOIMG_BOT_SECRET")
+  service_token: System.get_env("FLOIMG_SERVICE_TOKEN")
 
 if config_env() == :prod do
   database_url =
