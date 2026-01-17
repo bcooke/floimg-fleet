@@ -28,6 +28,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
   alias FloimgFleet.Bots
   alias FloimgFleet.Bots.Schemas.Bot
   alias FloimgFleet.FloImgAPI
+  alias FloimgFleet.LLM.Client, as: LLM
 
   require Logger
 
@@ -256,32 +257,50 @@ defmodule FloimgFleet.Runtime.BotAgent do
   end
 
   defp generate_caption(bot) do
-    # Simple caption generation based on bot personality
-    # In production, this would use an LLM
+    case LLM.generate_caption(bot) do
+      {:ok, caption} ->
+        caption
+
+      {:error, _reason} ->
+        # Fallback to simple generation
+        fallback_caption(bot)
+    end
+  end
+
+  defp generate_comment(bot, post) do
+    case LLM.generate_comment(bot, post) do
+      {:ok, comment} ->
+        comment
+
+      {:error, _reason} ->
+        # Fallback to simple generation
+        fallback_comment(bot)
+    end
+  end
+
+  defp fallback_caption(bot) do
     captions = [
-      "Check out what I made! 🎨",
+      "Check out what I made!",
       "Just experimenting with some new ideas",
       "Love how this turned out",
       "Playing around with different styles",
       "What do you think?",
-      "#{bot.vibe || "Feeling creative"} vibes today ✨"
+      "#{bot.vibe || "Feeling creative"} vibes today"
     ]
 
     Enum.random(captions)
   end
 
-  defp generate_comment(bot, _post) do
-    # Simple comment generation
-    # In production, this would use an LLM to generate contextual comments
+  defp fallback_comment(bot) do
     comments = [
-      "This is amazing! 🔥",
+      "This is amazing!",
       "Love the style!",
       "Great work!",
       "So creative!",
       "Wow, this is cool",
       "Really nice composition",
       "The colors are perfect",
-      "#{bot.vibe || "Nice"} 👏"
+      "#{bot.vibe || "Nice"} work!"
     ]
 
     Enum.random(comments)

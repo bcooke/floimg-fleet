@@ -73,6 +73,22 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
             />
           </div>
 
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Interests</span>
+            </label>
+            <input
+              type="text"
+              name={@form[:interests].name}
+              value={interests_to_string(@form[:interests].value)}
+              class="input input-bordered"
+              placeholder="e.g., photography, travel, nature (comma-separated)"
+            />
+            <label class="label">
+              <span class="label-text-alt text-base-content/60">Separate interests with commas</span>
+            </label>
+          </div>
+
           <div class="divider">Behavior Settings</div>
 
           <div class="grid grid-cols-3 gap-4">
@@ -222,6 +238,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
     |> Map.update("post_probability", nil, &from_percent/1)
     |> Map.update("comment_probability", nil, &from_percent/1)
     |> Map.update("like_probability", nil, &from_percent/1)
+    |> Map.update("interests", nil, &parse_interests/1)
   end
 
   defp to_percent(nil), do: 0
@@ -233,4 +250,20 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
   defp from_percent(""), do: nil
   defp from_percent(value) when is_binary(value), do: String.to_integer(value) / 100
   defp from_percent(value) when is_integer(value), do: value / 100
+
+  defp interests_to_string(nil), do: ""
+  defp interests_to_string(interests) when is_list(interests), do: Enum.join(interests, ", ")
+  defp interests_to_string(interests), do: interests
+
+  defp parse_interests(nil), do: []
+  defp parse_interests(""), do: []
+
+  defp parse_interests(value) when is_binary(value) do
+    value
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp parse_interests(value) when is_list(value), do: value
 end
