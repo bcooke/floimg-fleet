@@ -15,14 +15,14 @@ defmodule FloimgFleet.Bots.Schemas.BotActivity do
   @event_types [:thought, :action, :post, :comment, :like, :error, :started, :paused, :stopped]
 
   schema "bot_activities" do
-    belongs_to :bot, FloimgFleet.Bots.Schemas.Bot
+    belongs_to(:bot, FloimgFleet.Bots.Schemas.Bot)
 
-    field :event_type, Ecto.Enum, values: @event_types
-    field :message, :string
-    field :emoji, :string
+    field(:event_type, Ecto.Enum, values: @event_types)
+    field(:message, :string)
+    field(:emoji, :string)
 
     # Optional metadata (e.g., post_id, target_user, etc.)
-    field :metadata, :map, default: %{}
+    field(:metadata, :map, default: %{})
 
     timestamps(type: :utc_datetime, updated_at: false)
   end

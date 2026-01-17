@@ -109,7 +109,11 @@ defmodule FloimgFleet.LLM.Client do
       body = %{
         model: model,
         messages: [
-          %{role: "system", content: "You are a creative social media user. Keep responses short (1-2 sentences max). Be authentic and natural."},
+          %{
+            role: "system",
+            content:
+              "You are a creative social media user. Keep responses short (1-2 sentences max). Be authentic and natural."
+          },
           %{role: "user", content: prompt}
         ],
         max_tokens: 100,
@@ -258,10 +262,18 @@ defmodule FloimgFleet.LLM.Client do
     |> String.upcase()
     |> String.trim()
     |> case do
-      "POST" -> :post
-      "COMMENT" -> :comment
-      "LIKE" -> :like
-      "BROWSE" -> :browse
+      "POST" ->
+        :post
+
+      "COMMENT" ->
+        :comment
+
+      "LIKE" ->
+        :like
+
+      "BROWSE" ->
+        :browse
+
       other ->
         # Try to extract action from a longer response
         cond do

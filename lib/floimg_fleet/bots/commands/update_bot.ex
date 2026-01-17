@@ -7,10 +7,22 @@ defmodule FloimgFleet.Bots.Commands.UpdateBot do
   alias FloimgFleet.Bots.Schemas.Bot
   alias FloimgFleet.Bots.Queries.GetBot
 
-  defstruct [:bot_id, :name, :username, :personality, :vibe, :interests,
-             :post_probability, :comment_probability, :like_probability,
-             :min_action_interval_seconds, :max_action_interval_seconds,
-             :status, :pid, :last_action_at]
+  defstruct [
+    :bot_id,
+    :name,
+    :username,
+    :personality,
+    :vibe,
+    :interests,
+    :post_probability,
+    :comment_probability,
+    :like_probability,
+    :min_action_interval_seconds,
+    :max_action_interval_seconds,
+    :status,
+    :pid,
+    :last_action_at
+  ]
 
   @type t :: %__MODULE__{}
 

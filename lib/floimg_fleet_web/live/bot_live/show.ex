@@ -214,7 +214,10 @@ defmodule FloimgFleetWeb.BotLive.Show do
                     {format_datetime(activity.inserted_at)}
                   </div>
                 </div>
-                <div :if={Enum.empty?(@streams.activities)} class="text-center text-base-content/60 py-4">
+                <div
+                  :if={Enum.empty?(@streams.activities)}
+                  class="text-center text-base-content/60 py-4"
+                >
                   No activity yet
                 </div>
               </div>

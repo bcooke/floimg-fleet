@@ -152,11 +152,8 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
      end)}
   end
 
-  require Logger
-
   @impl true
   def handle_event("validate", %{"bot" => bot_params}, socket) do
-    Logger.info("VALIDATE event received: #{inspect(bot_params)}")
     bot_params = normalize_params(bot_params)
 
     changeset =
@@ -168,14 +165,8 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
   end
 
   def handle_event("save", %{"bot" => bot_params}, socket) do
-    Logger.info("SAVE event received: #{inspect(bot_params)}")
     bot_params = normalize_params(bot_params)
     save_bot(socket, socket.assigns.action, bot_params)
-  end
-
-  def handle_event(event, params, socket) do
-    Logger.warning("UNKNOWN EVENT: #{event} - params: #{inspect(params)}")
-    {:noreply, socket}
   end
 
   defp save_bot(socket, :edit, bot_params) do

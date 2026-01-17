@@ -15,31 +15,31 @@ defmodule FloimgFleet.Bots.Schemas.Bot do
   @statuses [:idle, :running, :paused, :error]
 
   schema "bots" do
-    field :name, :string
-    field :username, :string
-    field :status, Ecto.Enum, values: @statuses, default: :idle
+    field(:name, :string)
+    field(:username, :string)
+    field(:status, Ecto.Enum, values: @statuses, default: :idle)
 
     # Personality traits (LLM-generated or configured)
-    field :personality, :string
-    field :vibe, :string
-    field :interests, {:array, :string}, default: []
+    field(:personality, :string)
+    field(:vibe, :string)
+    field(:interests, {:array, :string}, default: [])
 
     # Behavior configuration
-    field :post_probability, :float, default: 0.3
-    field :comment_probability, :float, default: 0.4
-    field :like_probability, :float, default: 0.5
-    field :min_action_interval_seconds, :integer, default: 60
-    field :max_action_interval_seconds, :integer, default: 300
+    field(:post_probability, :float, default: 0.3)
+    field(:comment_probability, :float, default: 0.4)
+    field(:like_probability, :float, default: 0.5)
+    field(:min_action_interval_seconds, :integer, default: 60)
+    field(:max_action_interval_seconds, :integer, default: 300)
 
     # Runtime tracking (denormalized for quick queries)
-    field :pid, :string
-    field :last_action_at, :utc_datetime
-    field :total_posts, :integer, default: 0
-    field :total_comments, :integer, default: 0
-    field :total_likes, :integer, default: 0
+    field(:pid, :string)
+    field(:last_action_at, :utc_datetime)
+    field(:total_posts, :integer, default: 0)
+    field(:total_comments, :integer, default: 0)
+    field(:total_likes, :integer, default: 0)
 
     # Soft delete
-    field :deleted_at, :utc_datetime
+    field(:deleted_at, :utc_datetime)
 
     timestamps(type: :utc_datetime)
   end
@@ -70,7 +70,10 @@ defmodule FloimgFleet.Bots.Schemas.Bot do
     |> validate_length(:name, min: 1, max: 100)
     |> validate_length(:username, min: 3, max: 30)
     |> validate_number(:post_probability, greater_than_or_equal_to: 0, less_than_or_equal_to: 1)
-    |> validate_number(:comment_probability, greater_than_or_equal_to: 0, less_than_or_equal_to: 1)
+    |> validate_number(:comment_probability,
+      greater_than_or_equal_to: 0,
+      less_than_or_equal_to: 1
+    )
     |> validate_number(:like_probability, greater_than_or_equal_to: 0, less_than_or_equal_to: 1)
     |> validate_number(:min_action_interval_seconds, greater_than: 0)
     |> validate_number(:max_action_interval_seconds, greater_than: 0)
