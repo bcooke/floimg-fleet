@@ -156,8 +156,8 @@ docker run -p 4000:4000 \
 | `PHX_HOST` | Yes (prod) | Production hostname |
 | `PORT` | No | HTTP port (default: 4000) |
 | `POOL_SIZE` | No | DB connection pool (default: 10) |
-| `FLOIMG_API_URL` | No | FloImg API endpoint |
-| `FLOIMG_BOT_SECRET` | No | Bot authentication secret |
+| `FLOIMG_API_URL` | No | FloImg API endpoint (default: https://api.floimg.com) |
+| `FLOIMG_SERVICE_TOKEN` | Yes (prod) | Service token for FloImg API authentication (format: fst_...) |
 
 ## Key Modules
 
