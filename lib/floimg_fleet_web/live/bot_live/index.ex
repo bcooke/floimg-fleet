@@ -13,6 +13,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Bots")
+     |> assign(:activities_empty, true)
      |> stream(:bots, Bots.list_bots())
      |> stream(:activities, [], at: 0)}
   end
@@ -50,7 +51,10 @@ defmodule FloimgFleetWeb.BotLive.Index do
 
   @impl true
   def handle_info({:bot_activity, activity}, socket) do
-    {:noreply, stream_insert(socket, :activities, activity, at: 0)}
+    {:noreply,
+     socket
+     |> assign(:activities_empty, false)
+     |> stream_insert(:activities, activity, at: 0)}
   end
 
   def handle_info({:bot_started, bot}, socket) do
@@ -237,7 +241,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
                     {format_time(activity.inserted_at)}
                   </div>
                 </div>
-                <div :if={Enum.empty?(@streams.activities)} class="text-center text-base-content/60 py-4">
+                <div :if={@activities_empty} class="text-center text-base-content/60 py-4">
                   No activity yet
                 </div>
               </div>
