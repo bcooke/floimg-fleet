@@ -145,12 +145,13 @@ defmodule FloimgFleet.LLM.Client do
   # ============================================================================
 
   defp build_caption_prompt(bot) do
-    personality = bot.personality || "a friendly social media user"
-    vibe = bot.vibe || "casual"
+    name = sanitize(bot.name) || "User"
+    personality = sanitize(bot.personality) || "a friendly social media user"
+    vibe = sanitize(bot.vibe) || "casual"
     interests = format_interests(bot.interests)
 
     """
-    You are #{bot.name}, #{personality}.
+    You are #{name}, #{personality}.
     Your vibe is: #{vibe}
     #{interests}
 
@@ -163,13 +164,14 @@ defmodule FloimgFleet.LLM.Client do
   end
 
   defp build_comment_prompt(bot, post) do
-    personality = bot.personality || "a friendly social media user"
-    vibe = bot.vibe || "casual"
+    name = sanitize(bot.name) || "User"
+    personality = sanitize(bot.personality) || "a friendly social media user"
+    vibe = sanitize(bot.vibe) || "casual"
     interests = format_interests(bot.interests)
-    post_caption = post["caption"] || "an image"
+    post_caption = sanitize(post["caption"]) || "an image"
 
     """
-    You are #{bot.name}, #{personality}.
+    You are #{name}, #{personality}.
     Your vibe is: #{vibe}
     #{interests}
 
@@ -182,14 +184,15 @@ defmodule FloimgFleet.LLM.Client do
   end
 
   defp build_decision_prompt(bot, context) do
-    personality = bot.personality || "a friendly social media user"
-    vibe = bot.vibe || "casual"
+    name = sanitize(bot.name) || "User"
+    personality = sanitize(bot.personality) || "a friendly social media user"
+    vibe = sanitize(bot.vibe) || "casual"
     interests = format_interests(bot.interests)
     feed_count = Map.get(context, :feed_count, "some")
-    recent_action = Map.get(context, :recent_action, "browsing")
+    recent_action = sanitize(Map.get(context, :recent_action, "browsing"))
 
     """
-    You are #{bot.name}, #{personality}.
+    You are #{name}, #{personality}.
     Your vibe is: #{vibe}
     #{interests}
 
@@ -211,8 +214,40 @@ defmodule FloimgFleet.LLM.Client do
   defp format_interests([]), do: ""
 
   defp format_interests(interests) when is_list(interests) do
-    "Your interests include: #{Enum.join(interests, ", ")}"
+    sanitized =
+      interests
+      |> Enum.map(&sanitize/1)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.take(10)
+
+    if Enum.empty?(sanitized) do
+      ""
+    else
+      "Your interests include: #{Enum.join(sanitized, ", ")}"
+    end
   end
+
+  # ============================================================================
+  # Input Sanitization (Prompt Injection Prevention)
+  # ============================================================================
+
+  @max_input_length 500
+
+  defp sanitize(nil), do: nil
+
+  defp sanitize(input) when is_binary(input) do
+    input
+    |> String.replace(~r/\n\n+/, " ")
+    |> String.replace(~r/[^\w\s.,!?'"-]/, "")
+    |> String.slice(0, @max_input_length)
+    |> String.trim()
+    |> case do
+      "" -> nil
+      sanitized -> sanitized
+    end
+  end
+
+  defp sanitize(_), do: nil
 
   # ============================================================================
   # Response Parsing
