@@ -176,8 +176,10 @@ defmodule FloimgFleet.Seeds do
   """
   def seed_bots(count \\ 6, opts \\ []) do
     alias FloimgFleet.Bots
+    alias FloimgFleet.FloImgAPI.Users
 
     persona_filter = Keyword.get(opts, :persona)
+    provision = Keyword.get(opts, :provision, true)
 
     IO.puts("\nSeeding #{count} bots...")
 
@@ -185,6 +187,12 @@ defmodule FloimgFleet.Seeds do
       IO.puts("Using persona: #{persona_filter}")
     else
       IO.puts("Using weighted random persona distribution")
+    end
+
+    if provision do
+      IO.puts("Will provision bots in FSC")
+    else
+      IO.puts("Skipping FSC provisioning (local only)")
     end
 
     IO.puts("")
@@ -196,6 +204,18 @@ defmodule FloimgFleet.Seeds do
         case Bots.create_bot(bot_attrs) do
           {:ok, bot} ->
             IO.puts("  ✓ Created: #{bot.name} (@#{bot.username}) [#{bot.persona_id}]")
+
+            # Provision in FSC if enabled
+            if provision do
+              case Users.provision_bot_user(bot) do
+                {:ok, _response} ->
+                  IO.puts("    ↳ Provisioned in FSC")
+
+                {:error, reason} ->
+                  IO.puts("    ↳ FSC provisioning failed: #{inspect(reason)}")
+              end
+            end
+
             {:ok, bot}
 
           {:error, changeset} ->
