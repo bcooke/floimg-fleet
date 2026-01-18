@@ -204,8 +204,65 @@ defmodule FloimgFleet.Runtime.BotAgent do
   # ============================================================================
 
   defp do_post(bot) do
-    # Generate a post with random image and caption
-    # In a real implementation, this would use an LLM to generate content
+    # Try workflow execution first, fall back to placeholder if it fails
+    case execute_workflow_post(bot) do
+      {:ok, post} ->
+        {:ok, post}
+
+      {:error, reason} ->
+        Logger.warning("[#{bot.name}] Workflow execution failed: #{inspect(reason)}, using placeholder")
+        do_placeholder_post(bot)
+    end
+  end
+
+  # Execute a real FloImg workflow and post the result
+  defp execute_workflow_post(bot) do
+    # Get a prompt for this bot's persona
+    prompt = get_workflow_prompt(bot)
+
+    if prompt do
+      # Build and execute the workflow
+      steps = FloImgAPI.build_generation_workflow(prompt, model: "dall-e-3", quality: "standard")
+
+      case FloImgAPI.execute_workflow(bot, steps, "fleet-#{bot.persona_id}") do
+        {:ok, %{"status" => "completed", "imageUrls" => [image_url | _]}} ->
+          # Successfully generated an image - post to gallery
+          caption = generate_caption(bot)
+
+          FloImgAPI.create_post(bot, %{
+            image_url: image_url,
+            caption: caption
+          })
+
+        {:ok, %{"status" => "completed", "imageUrls" => []}} ->
+          {:error, :no_images_generated}
+
+        {:ok, %{"error" => error}} ->
+          {:error, {:workflow_error, error}}
+
+        {:error, reason} ->
+          {:error, reason}
+      end
+    else
+      {:error, :no_prompt_template}
+    end
+  end
+
+  # Get a prompt for this bot based on persona or LLM
+  defp get_workflow_prompt(bot) do
+    # First try LLM-generated prompt
+    case LLM.generate_prompt(bot) do
+      {:ok, prompt} when is_binary(prompt) and prompt != "" ->
+        prompt
+
+      _ ->
+        # Fall back to persona template
+        Seeds.get_random_prompt(bot.persona_id)
+    end
+  end
+
+  # Fallback to placeholder image when workflow fails
+  defp do_placeholder_post(bot) do
     attrs = %{
       image_url: generate_placeholder_image(),
       caption: generate_caption(bot)

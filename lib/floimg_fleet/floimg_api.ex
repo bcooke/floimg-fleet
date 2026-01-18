@@ -25,7 +25,7 @@ defmodule FloimgFleet.FloImgAPI do
       FloImgAPI.get_feed(bot)
   """
 
-  alias FloimgFleet.FloImgAPI.{Gallery, Interactions}
+  alias FloimgFleet.FloImgAPI.{Gallery, Interactions, Workflows}
 
   @doc """
   Create a new gallery post.
@@ -71,4 +71,23 @@ defmodule FloimgFleet.FloImgAPI do
   Get comments for a post.
   """
   defdelegate get_comments(bot, post_id, opts \\ []), to: Interactions
+
+  # ============================================================================
+  # Workflow Execution
+  # ============================================================================
+
+  @doc """
+  Execute a workflow pipeline and return generated image URLs.
+  """
+  defdelegate execute_workflow(bot, steps, name \\ nil), to: Workflows
+
+  @doc """
+  Build a simple AI image generation workflow.
+  """
+  defdelegate build_generation_workflow(prompt, opts \\ []), to: Workflows
+
+  @doc """
+  Build a workflow that generates and resizes an image.
+  """
+  defdelegate build_generation_with_resize_workflow(prompt, width, height, opts \\ []), to: Workflows
 end

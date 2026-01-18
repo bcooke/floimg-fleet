@@ -32,6 +32,16 @@ defmodule FloimgFleet.LLM.Client do
   end
 
   @doc """
+  Generate a DALL-E prompt for image generation based on the bot's persona.
+
+  Returns {:ok, prompt} or {:error, reason}.
+  """
+  def generate_prompt(bot) do
+    prompt = build_image_prompt(bot)
+    generate(prompt)
+  end
+
+  @doc """
   Generate a comment for a post based on the bot's personality and the post content.
   """
   def generate_comment(bot, post) do
@@ -149,6 +159,37 @@ defmodule FloimgFleet.LLM.Client do
   # ============================================================================
   # Prompt Building
   # ============================================================================
+
+  defp build_image_prompt(bot) do
+    name = sanitize(bot.name) || "User"
+    personality = sanitize(bot.personality) || "a creative person"
+    vibe = sanitize(bot.vibe) || "casual"
+    interests = format_interests(bot.interests)
+    workflows = format_workflows(bot.persona_id)
+
+    # Get example prompts from persona to guide the style
+    example_prompts = Seeds.get_prompt_templates(bot.persona_id)
+    examples_text = if Enum.empty?(example_prompts) do
+      ""
+    else
+      examples = example_prompts |> Enum.take(2) |> Enum.join("\n- ")
+      "Here are examples of prompts in your style:\n- #{examples}"
+    end
+
+    """
+    You are #{name}, #{personality}.
+    Your vibe is: #{vibe}
+    #{interests}
+    #{workflows}
+
+    #{examples_text}
+
+    Generate a DALL-E prompt for an image you would create.
+    The prompt should be detailed (30-60 words) and match your personality and interests.
+    Include style, lighting, composition, and mood descriptors.
+    Output ONLY the prompt text, nothing else.
+    """
+  end
 
   defp build_caption_prompt(bot) do
     name = sanitize(bot.name) || "User"
