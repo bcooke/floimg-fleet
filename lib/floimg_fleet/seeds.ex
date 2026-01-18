@@ -6,6 +6,8 @@ defmodule FloimgFleet.Seeds do
   different FloImg user archetypes (product photographer, social marketer, etc.).
   """
 
+  require Logger
+
   @personas_path "priv/seeds/personas.json"
 
   @doc """
@@ -168,21 +170,28 @@ defmodule FloimgFleet.Seeds do
   defp day_to_js_day(day), do: day
 
   # Check if hour is within range, handling midnight wraparound
+  # Same start/end means zero-length range (never matches)
+  defp in_hour_range?(_hour, start_hour, start_hour), do: false
+
   defp in_hour_range?(hour, start_hour, end_hour) when end_hour > start_hour do
     hour >= start_hour and hour < end_hour
   end
 
   defp in_hour_range?(hour, start_hour, end_hour) do
-    # Handles ranges like [20, 2] meaning 8pm to 2am
+    # Handles midnight wraparound like [20, 2] meaning 8pm to 2am
     hour >= start_hour or hour < end_hour
   end
 
   # Convert datetime to a specific timezone
-  # Falls back to UTC if timezone is invalid
+  # Falls back to UTC with warning if timezone is invalid
   defp convert_to_timezone(datetime, timezone) do
     case DateTime.shift_zone(datetime, timezone) do
-      {:ok, local} -> local
-      {:error, _} -> datetime
+      {:ok, local} ->
+        local
+
+      {:error, reason} ->
+        Logger.warning("Invalid timezone '#{timezone}': #{inspect(reason)}, falling back to UTC")
+        datetime
     end
   end
 
