@@ -222,15 +222,33 @@ defmodule FloimgFleet.LLM.Client do
     interests = format_interests(bot.interests)
     post_caption = sanitize(post["caption"]) || "an image"
 
+    post_author =
+      case post["user"] do
+        %{"displayName" => name} when is_binary(name) and name != "" -> sanitize(name)
+        %{"username" => username} when is_binary(username) -> sanitize(username)
+        _ -> "someone"
+      end
+
+    # Add variety to comment style
+    comment_style =
+      Enum.random([
+        "give a genuine compliment",
+        "ask a curious question about their technique",
+        "share a brief related thought",
+        "express appreciation"
+      ])
+
     """
     You are #{name}, #{personality}.
     Your vibe is: #{vibe}
     #{interests}
 
-    You're looking at a post with this caption: "#{post_caption}"
+    You're looking at a post by #{post_author} with this caption: "#{post_caption}"
 
     Write a short, genuine comment (1 sentence max).
-    Be natural and authentic to your personality.
+    Style: #{comment_style}
+    Be natural and authentic to your personality. Don't use hashtags.
+    If you share their interest area, you can reference that connection.
     Just output the comment text, nothing else.
     """
   end

@@ -430,10 +430,18 @@ defmodule FloimgFleet.Runtime.BotAgent do
   end
 
   defp schedule_next_action(bot) do
-    delay =
+    # Get base delay from bot's configured interval
+    base_delay =
       Enum.random(
         (bot.min_action_interval_seconds * 1_000)..(bot.max_action_interval_seconds * 1_000)
       )
+
+    # Apply activity multiplier based on persona's schedule
+    # Higher multiplier = more active = shorter delays
+    multiplier = Seeds.get_activity_multiplier(bot.persona_id)
+
+    # Ensure minimum delay of 5 seconds to avoid hammering the API
+    delay = max(5_000, round(base_delay / multiplier))
 
     schedule_think(delay)
   end
