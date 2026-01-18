@@ -68,6 +68,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
   def handle_info({:activity, _event_type, %{} = activity}, socket) do
     # Convert to activity stream format with unique ID
     activity_with_id = Map.put(activity, :id, System.unique_integer([:positive]))
+
     {:noreply,
      socket
      |> assign(:activities_empty, false)
@@ -104,6 +105,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
     case Bots.pause_bot(id) do
       :ok ->
         {:ok, bot} = Bots.get_bot(id)
+
         {:noreply,
          socket
          |> stream_insert(:bots, bot)
@@ -155,6 +157,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
 
   def handle_event("filter_persona", %{"persona" => ""}, socket) do
     bots = Bots.list_bots()
+
     {:noreply,
      socket
      |> assign(:persona_filter, nil)
@@ -165,6 +168,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
   def handle_event("filter_persona", %{"persona" => persona_id}, socket) do
     all_bots = Bots.list_bots()
     filtered_bots = Enum.filter(all_bots, fn bot -> bot.persona_id == persona_id end)
+
     {:noreply,
      socket
      |> assign(:persona_filter, persona_id)

@@ -169,12 +169,14 @@ defmodule FloimgFleet.LLM.Client do
 
     # Get example prompts from persona to guide the style
     example_prompts = Seeds.get_prompt_templates(bot.persona_id)
-    examples_text = if Enum.empty?(example_prompts) do
-      ""
-    else
-      examples = example_prompts |> Enum.take(2) |> Enum.join("\n- ")
-      "Here are examples of prompts in your style:\n- #{examples}"
-    end
+
+    examples_text =
+      if Enum.empty?(example_prompts) do
+        ""
+      else
+        examples = example_prompts |> Enum.take(2) |> Enum.join("\n- ")
+        "Here are examples of prompts in your style:\n- #{examples}"
+      end
 
     """
     You are #{name}, #{personality}.

@@ -89,5 +89,6 @@ defmodule FloimgFleet.FloImgAPI do
   @doc """
   Build a workflow that generates and resizes an image.
   """
-  defdelegate build_generation_with_resize_workflow(prompt, width, height, opts \\ []), to: Workflows
+  defdelegate build_generation_with_resize_workflow(prompt, width, height, opts \\ []),
+    to: Workflows
 end

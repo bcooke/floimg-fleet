@@ -84,7 +84,9 @@ defmodule FloimgFleet.Seeds do
   """
   def get_random_prompt(persona_id) do
     case get_persona(persona_id) do
-      nil -> nil
+      nil ->
+        nil
+
       persona ->
         prompts = persona["prompt_templates"] || []
         if prompts == [], do: nil, else: Enum.random(prompts)
@@ -127,7 +129,9 @@ defmodule FloimgFleet.Seeds do
     # Deterministic selection based on persona + index
     adj_index = :erlang.phash2({persona["id"], index, :adj}, length(adjectives))
     noun_index = :erlang.phash2({persona["id"], index, :noun}, length(nouns))
-    template_index = :erlang.phash2({persona["id"], index, :template}, length(persona["name_templates"]))
+
+    template_index =
+      :erlang.phash2({persona["id"], index, :template}, length(persona["name_templates"]))
 
     adj = Enum.at(adjectives, adj_index)
     noun = Enum.at(nouns, noun_index)
