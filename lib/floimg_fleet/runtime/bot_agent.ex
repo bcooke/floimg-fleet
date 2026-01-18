@@ -210,7 +210,10 @@ defmodule FloimgFleet.Runtime.BotAgent do
         {:ok, post}
 
       {:error, reason} ->
-        Logger.warning("[#{bot.name}] Workflow execution failed: #{inspect(reason)}, using placeholder")
+        Logger.warning(
+          "[#{bot.name}] Workflow execution failed: #{inspect(reason)}, using placeholder"
+        )
+
         do_placeholder_post(bot)
     end
   end
@@ -362,16 +365,36 @@ defmodule FloimgFleet.Runtime.BotAgent do
     vibe_comments =
       case bot.vibe do
         "professional" ->
-          ["Clean execution!", "Great composition.", "Love the attention to detail.", "Professional quality work."]
+          [
+            "Clean execution!",
+            "Great composition.",
+            "Love the attention to detail.",
+            "Professional quality work."
+          ]
 
         "trendy" ->
-          ["This is fire 🔥", "Obsessed with this!", "Major vibes!", "The aesthetic is everything!"]
+          [
+            "This is fire 🔥",
+            "Obsessed with this!",
+            "Major vibes!",
+            "The aesthetic is everything!"
+          ]
 
         "creative" ->
-          ["So creative!", "Love the style!", "The artistry here is amazing.", "This is really cool!"]
+          [
+            "So creative!",
+            "Love the style!",
+            "The artistry here is amazing.",
+            "This is really cool!"
+          ]
 
         "analytical" ->
-          ["Clear and well-structured.", "Great data presentation.", "Love how readable this is.", "Excellent visualization."]
+          [
+            "Clear and well-structured.",
+            "Great data presentation.",
+            "Love how readable this is.",
+            "Excellent visualization."
+          ]
 
         "experimental" ->
           ["This is wild!", "Love the experimentation!", "So unique!", "Pushing boundaries!"]

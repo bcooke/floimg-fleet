@@ -49,7 +49,10 @@ defmodule FloimgFleet.FloImgAPI.Users do
         {:ok, response}
 
       {:error, {:validation_error, details}} ->
-        Logger.error("Failed to provision bot #{bot.username}: validation error - #{inspect(details)}")
+        Logger.error(
+          "Failed to provision bot #{bot.username}: validation error - #{inspect(details)}"
+        )
+
         {:error, {:validation_error, details}}
 
       {:error, reason} ->
