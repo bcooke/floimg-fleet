@@ -3,6 +3,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
 
   alias FloimgFleet.Bots
   alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Seeds
 
   @impl true
   def mount(_params, _session, socket) do
@@ -10,11 +11,17 @@ defmodule FloimgFleetWeb.BotLive.Index do
       Phoenix.PubSub.subscribe(FloimgFleet.PubSub, "fleet:activity")
     end
 
+    bots = Bots.list_bots()
+    persona_stats = count_by_persona(bots)
+
     {:ok,
      socket
      |> assign(:page_title, "Bots")
      |> assign(:activities_empty, true)
-     |> stream(:bots, Bots.list_bots())
+     |> assign(:persona_filter, nil)
+     |> assign(:persona_stats, persona_stats)
+     |> assign(:persona_ids, Seeds.list_persona_ids())
+     |> stream(:bots, bots)
      |> stream(:activities, [], at: 0)}
   end
 
@@ -139,11 +146,30 @@ defmodule FloimgFleetWeb.BotLive.Index do
         {:noreply,
          socket
          |> stream(:bots, Bots.list_bots(), reset: true)
-         |> put_flash(:info, "Resumed #{count} bots")}
+         |> put_flash(:info, "Started #{count} bots")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to resume all: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to start all: #{reason}")}
     end
+  end
+
+  def handle_event("filter_persona", %{"persona" => ""}, socket) do
+    bots = Bots.list_bots()
+    {:noreply,
+     socket
+     |> assign(:persona_filter, nil)
+     |> assign(:persona_stats, count_by_persona(bots))
+     |> stream(:bots, bots, reset: true)}
+  end
+
+  def handle_event("filter_persona", %{"persona" => persona_id}, socket) do
+    all_bots = Bots.list_bots()
+    filtered_bots = Enum.filter(all_bots, fn bot -> bot.persona_id == persona_id end)
+    {:noreply,
+     socket
+     |> assign(:persona_filter, persona_id)
+     |> assign(:persona_stats, count_by_persona(all_bots))
+     |> stream(:bots, filtered_bots, reset: true)}
   end
 
   @impl true
@@ -151,13 +177,34 @@ defmodule FloimgFleetWeb.BotLive.Index do
     ~H"""
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Bot Fleet</h1>
-        <div class="flex gap-2">
+        <div>
+          <h1 class="text-2xl font-bold">Bot Fleet</h1>
+          <div class="flex gap-2 mt-2">
+            <%= for {persona, count} <- @persona_stats do %>
+              <span class="badge badge-outline badge-sm">
+                {format_persona(persona)}: {count}
+              </span>
+            <% end %>
+          </div>
+        </div>
+        <div class="flex gap-2 items-center">
+          <select
+            class="select select-bordered select-sm"
+            phx-change="filter_persona"
+            name="persona"
+          >
+            <option value="">All Personas</option>
+            <%= for persona_id <- @persona_ids do %>
+              <option value={persona_id} selected={@persona_filter == persona_id}>
+                {format_persona(persona_id)}
+              </option>
+            <% end %>
+          </select>
           <button phx-click="pause_all" class="btn btn-warning btn-sm">
-            Pause All
+            Stop All
           </button>
           <button phx-click="resume_all" class="btn btn-success btn-sm">
-            Resume All
+            Start All
           </button>
           <.link navigate={~p"/bots/new"} class="btn btn-primary btn-sm">
             New Bot
@@ -176,6 +223,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
                     <tr>
                       <th>Name</th>
                       <th>Username</th>
+                      <th>Persona</th>
                       <th>Status</th>
                       <th>Last Action</th>
                       <th>Actions</th>
@@ -189,6 +237,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
                         </.link>
                       </td>
                       <td>{bot.username}</td>
+                      <td>
+                        <span class="badge badge-ghost badge-sm">
+                          {format_persona(bot.persona_id)}
+                        </span>
+                      </td>
                       <td>
                         <.status_badge status={bot.status} />
                       </td>
@@ -297,4 +350,14 @@ defmodule FloimgFleetWeb.BotLive.Index do
   defp format_time(datetime) do
     Calendar.strftime(datetime, "%H:%M:%S")
   end
+
+  defp count_by_persona(bots) do
+    Enum.reduce(bots, %{}, fn bot, acc ->
+      persona = bot.persona_id || "custom"
+      Map.update(acc, persona, 1, &(&1 + 1))
+    end)
+  end
+
+  defp format_persona(nil), do: "custom"
+  defp format_persona(id), do: String.replace(id, "_", " ")
 end
