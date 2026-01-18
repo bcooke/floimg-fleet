@@ -19,6 +19,7 @@ defmodule FloimgFleet.Bots.Commands.CreateBot do
   defstruct [
     :name,
     :username,
+    :persona_id,
     :personality,
     :vibe,
     interests: [],
@@ -32,6 +33,7 @@ defmodule FloimgFleet.Bots.Commands.CreateBot do
   @type t :: %__MODULE__{
           name: String.t(),
           username: String.t(),
+          persona_id: String.t() | nil,
           personality: String.t() | nil,
           vibe: String.t() | nil,
           interests: [String.t()],

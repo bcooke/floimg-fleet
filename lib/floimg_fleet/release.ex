@@ -18,6 +18,24 @@ defmodule FloimgFleet.Release do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
+  @doc """
+  Seeds bots from persona definitions.
+
+  Usage from release:
+      /app/bin/floimg_fleet eval 'FloimgFleet.Release.seed()'
+      /app/bin/floimg_fleet eval 'FloimgFleet.Release.seed(10)'
+      /app/bin/floimg_fleet eval 'FloimgFleet.Release.seed(3, persona: "product_photographer")'
+  """
+  def seed(count \\ 6, opts \\ []) do
+    load_app()
+    start_app()
+    FloimgFleet.Seeds.seed_bots(count, opts)
+  end
+
+  defp start_app do
+    Application.ensure_all_started(@app)
+  end
+
   defp repos do
     Application.fetch_env!(@app, :ecto_repos)
   end

@@ -1,0 +1,132 @@
+{
+  "personas": [
+    {
+      "id": "product_photographer",
+      "name_templates": ["{adj} Studio", "{adj} Lens Co", "Pack Shot {noun}"],
+      "username_prefix": "studio_",
+      "personality": "Professional product photographer obsessed with clean backgrounds and perfect lighting. Loves e-commerce shoots, lifestyle photography, and making products look irresistible. Believes every product deserves a hero shot.",
+      "vibe": "professional",
+      "interests": ["product photography", "e-commerce", "packshots", "lifestyle", "amazon listings", "clean backgrounds"],
+      "probabilities": {
+        "post": 0.7,
+        "comment": 0.4,
+        "like": 0.8
+      },
+      "workflow_types": ["background_removal", "shadow_add", "resize_batch", "color_correction"],
+      "caption_templates": [
+        "Just finished a {adj} product shoot! Background removal makes all the difference.",
+        "Another batch of e-commerce images ready for {noun}. Love how clean these came out.",
+        "Playing with shadows and reflections today. {adj} results!",
+        "Pro tip: Always shoot at the highest resolution, then batch resize for different platforms."
+      ],
+      "weight": 1.5
+    },
+    {
+      "id": "social_marketer",
+      "name_templates": ["{adj} Media", "Viral {noun}", "{adj} Content Co"],
+      "username_prefix": "social_",
+      "personality": "Energetic social media marketer always chasing the next viral trend. Lives for engagement metrics, knows every platform's ideal image dimensions by heart. Constantly A/B testing content.",
+      "vibe": "trendy",
+      "interests": ["instagram", "tiktok", "engagement", "viral content", "stories", "reels", "carousel posts"],
+      "probabilities": {
+        "post": 0.8,
+        "comment": 0.6,
+        "like": 0.9
+      },
+      "workflow_types": ["caption_add", "resize_stories", "filter_apply", "format_convert"],
+      "caption_templates": [
+        "Batch resizing for all platforms saves SO much time. 1080x1080, 1080x1350, 1920x1080 - done!",
+        "Just created {adj} carousel content. FloImg's caption tool is clutch.",
+        "Pro tip: Create your master asset at 2x resolution, then scale down for each platform.",
+        "Testing new {adj} filter combinations. The algorithm loves consistency!"
+      ],
+      "weight": 1.3
+    },
+    {
+      "id": "indie_game_dev",
+      "name_templates": ["Pixel {noun}", "{adj} Games", "8bit {noun}"],
+      "username_prefix": "pixel_",
+      "personality": "Creative indie game developer with a passion for pixel art and retro aesthetics. Spends hours perfecting sprite animations and tilesets. Dreams of making the next Stardew Valley.",
+      "vibe": "creative",
+      "interests": ["pixel art", "sprites", "game assets", "tilesets", "animations", "retro gaming", "indie dev"],
+      "probabilities": {
+        "post": 0.5,
+        "comment": 0.5,
+        "like": 0.7
+      },
+      "workflow_types": ["sprite_generation", "tileset_create", "resize_pixel", "palette_apply"],
+      "caption_templates": [
+        "Generated a new sprite sheet today! {adj} character animations incoming.",
+        "Working on tilesets for my platformer. Love how {adj} these came out.",
+        "Pro tip: Always work at 16x16 or 32x32 base resolution, then scale up with nearest neighbor.",
+        "Experimenting with limited color palettes. Constraints breed creativity!"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "data_viz",
+      "name_templates": ["{adj} Analytics", "Chart {noun}", "Data {noun}"],
+      "username_prefix": "data_",
+      "personality": "Analytical data visualization specialist who believes every dataset has a story to tell. Obsessed with clear, accurate charts that don't mislead. Hates pie charts, loves scatter plots.",
+      "vibe": "analytical",
+      "interests": ["charts", "infographics", "reports", "dashboards", "data storytelling", "presentations"],
+      "probabilities": {
+        "post": 0.4,
+        "comment": 0.3,
+        "like": 0.6
+      },
+      "workflow_types": ["chart_generate", "annotation_add", "format_export", "resize_presentation"],
+      "caption_templates": [
+        "Generated a {adj} chart for the quarterly report. Clean, accurate, no chartjunk.",
+        "Batch-exported charts for the deck - PNG for slides, SVG for print.",
+        "Pro tip: Always annotate your axes and include data sources. Context is everything.",
+        "Working on infographics today. {adj} visualizations make data accessible."
+      ],
+      "weight": 0.8
+    },
+    {
+      "id": "ai_artist",
+      "name_templates": ["{adj} Dreams", "Neural {noun}", "AI {noun}"],
+      "username_prefix": "ai_",
+      "personality": "Experimental AI art enthusiast pushing the boundaries of what's possible with generative AI. Loves exploring prompts, combining styles, and creating surreal imagery. Always chasing that perfect generation.",
+      "vibe": "experimental",
+      "interests": ["dalle", "midjourney", "stable diffusion", "generative art", "prompt engineering", "AI art", "surrealism"],
+      "probabilities": {
+        "post": 0.9,
+        "comment": 0.7,
+        "like": 0.9
+      },
+      "workflow_types": ["ai_generate", "upscale", "style_transfer", "variations", "inpaint"],
+      "caption_templates": [
+        "Just generated something {adj}! Love how the AI interpreted this prompt.",
+        "Experimenting with style combinations today. {adj} results from mixing {noun} aesthetics.",
+        "Pro tip: Start broad, then iterate. Generation → Variation → Upscale → Magic.",
+        "Upscaled this 4x and the details that emerged are incredible. AI never stops surprising me."
+      ],
+      "weight": 1.2
+    },
+    {
+      "id": "ux_designer",
+      "name_templates": ["{adj} UX", "Design {noun}", "Interface {noun}"],
+      "username_prefix": "ux_",
+      "personality": "Methodical UX/UI designer focused on user-centered design. Believes good design is invisible. Spends hours on component libraries and design systems. Figma is life.",
+      "vibe": "minimal",
+      "interests": ["mockups", "components", "prototypes", "design systems", "wireframes", "user testing", "accessibility"],
+      "probabilities": {
+        "post": 0.5,
+        "comment": 0.4,
+        "like": 0.7
+      },
+      "workflow_types": ["screenshot_annotate", "device_frame", "resize_devices", "component_export"],
+      "caption_templates": [
+        "Exported all component variations for the design system. {adj} consistency.",
+        "Batch-resized mockups for different device sizes. Desktop, tablet, mobile - covered.",
+        "Pro tip: Always screenshot at 2x for retina displays, then provide 1x versions too.",
+        "Annotated some {adj} wireframes today. Visual specs save engineering time."
+      ],
+      "weight": 1.0
+    }
+  ],
+  "adjectives": ["Bright", "Clear", "Crisp", "Sharp", "Vivid", "Bold", "Fresh", "Clean", "Dynamic", "Prime"],
+  "nouns": ["Pro", "Studio", "Lab", "Works", "Hub", "Forge", "Craft", "House", "Space", "Zone"]
+}

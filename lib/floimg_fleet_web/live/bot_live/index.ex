@@ -57,6 +57,16 @@ defmodule FloimgFleetWeb.BotLive.Index do
      |> stream_insert(:activities, activity, at: 0)}
   end
 
+  # Handle activity events from BotAgent broadcasts
+  def handle_info({:activity, _event_type, %{} = activity}, socket) do
+    # Convert to activity stream format with unique ID
+    activity_with_id = Map.put(activity, :id, System.unique_integer([:positive]))
+    {:noreply,
+     socket
+     |> assign(:activities_empty, false)
+     |> stream_insert(:activities, activity_with_id, at: 0)}
+  end
+
   def handle_info({:bot_started, bot}, socket) do
     {:noreply, stream_insert(socket, :bots, bot)}
   end
@@ -85,7 +95,8 @@ defmodule FloimgFleetWeb.BotLive.Index do
 
   def handle_event("pause", %{"id" => id}, socket) do
     case Bots.pause_bot(id) do
-      {:ok, bot} ->
+      :ok ->
+        {:ok, bot} = Bots.get_bot(id)
         {:noreply,
          socket
          |> stream_insert(:bots, bot)

@@ -60,6 +60,7 @@ defmodule FloimgFleet.Bots do
   Creates a new bot with the given attributes.
   """
   def create_bot(attrs) do
+    attrs = atomize_keys(attrs)
     Commands.CreateBot.execute(struct(Commands.CreateBot, attrs))
   end
 
@@ -67,8 +68,17 @@ defmodule FloimgFleet.Bots do
   Updates an existing bot.
   """
   def update_bot(bot_id, attrs) do
+    attrs = atomize_keys(attrs)
     attrs = Map.put(attrs, :bot_id, bot_id)
     Commands.UpdateBot.execute(struct(Commands.UpdateBot, attrs))
+  end
+
+  # Converts string keys to atoms for struct creation
+  defp atomize_keys(map) when is_map(map) do
+    for {key, val} <- map, into: %{} do
+      key = if is_binary(key), do: String.to_existing_atom(key), else: key
+      {key, val}
+    end
   end
 
   @doc """

@@ -19,6 +19,9 @@ defmodule FloimgFleet.Bots.Schemas.Bot do
     field(:username, :string)
     field(:status, Ecto.Enum, values: @statuses, default: :idle)
 
+    # Persona reference (for seeded bots)
+    field(:persona_id, :string)
+
     # Personality traits (LLM-generated or configured)
     field(:personality, :string)
     field(:vibe, :string)
@@ -46,6 +49,7 @@ defmodule FloimgFleet.Bots.Schemas.Bot do
 
   @required_fields [:name, :username]
   @optional_fields [
+    :persona_id,
     :personality,
     :vibe,
     :interests,
