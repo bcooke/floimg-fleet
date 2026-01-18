@@ -41,6 +41,42 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
+  Gets caption templates for a persona, with placeholder substitution.
+
+  Returns a list of ready-to-use captions with {adj} and {noun} placeholders
+  replaced with random values from the seed data.
+  """
+  def get_caption_templates(persona_id) do
+    data = load_personas()
+    persona = Enum.find(data["personas"], fn p -> p["id"] == persona_id end)
+
+    if persona do
+      adjectives = data["adjectives"]
+      nouns = data["nouns"]
+
+      Enum.map(persona["caption_templates"] || [], fn template ->
+        template
+        |> String.replace("{adj}", Enum.random(adjectives))
+        |> String.replace("{noun}", Enum.random(nouns))
+      end)
+    else
+      []
+    end
+  end
+
+  @doc """
+  Gets workflow types for a persona.
+
+  These represent the kinds of FloImg workflows this persona typically uses.
+  """
+  def get_workflow_types(persona_id) do
+    case get_persona(persona_id) do
+      nil -> []
+      persona -> persona["workflow_types"] || []
+    end
+  end
+
+  @doc """
   Generates bot attributes from a persona definition.
 
   The index parameter ensures deterministic name generation -

@@ -15,6 +15,8 @@ defmodule FloimgFleet.LLM.Client do
   - `OPENAI_MODEL`: OpenAI model (default: "gpt-4o-mini")
   """
 
+  alias FloimgFleet.Seeds
+
   require Logger
 
   @ollama_default_url "http://localhost:11434"
@@ -153,15 +155,18 @@ defmodule FloimgFleet.LLM.Client do
     personality = sanitize(bot.personality) || "a friendly social media user"
     vibe = sanitize(bot.vibe) || "casual"
     interests = format_interests(bot.interests)
+    workflows = format_workflows(bot.persona_id)
 
     """
     You are #{name}, #{personality}.
     Your vibe is: #{vibe}
     #{interests}
+    #{workflows}
 
-    You just created an image to share on a social platform.
+    You just created an image using FloImg (an image workflow platform).
     Write a short caption for your post (1-2 sentences max).
     Be natural and authentic to your personality.
+    Reference what you actually did with the image if relevant.
     Don't use hashtags.
     Just output the caption text, nothing else.
     """
@@ -229,6 +234,29 @@ defmodule FloimgFleet.LLM.Client do
     else
       "Your interests include: #{Enum.join(sanitized, ", ")}"
     end
+  end
+
+  defp format_workflows(nil), do: ""
+
+  defp format_workflows(persona_id) do
+    workflow_types = Seeds.get_workflow_types(persona_id)
+
+    if Enum.empty?(workflow_types) do
+      ""
+    else
+      formatted =
+        workflow_types
+        |> Enum.map(&format_workflow_type/1)
+        |> Enum.join(", ")
+
+      "You typically use FloImg for: #{formatted}"
+    end
+  end
+
+  defp format_workflow_type(type) do
+    type
+    |> String.replace("_", " ")
+    |> String.capitalize()
   end
 
   # ============================================================================

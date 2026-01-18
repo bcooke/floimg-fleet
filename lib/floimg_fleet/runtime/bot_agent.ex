@@ -29,6 +29,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
   alias FloimgFleet.Bots.Schemas.Bot
   alias FloimgFleet.FloImgAPI
   alias FloimgFleet.LLM.Client, as: LLM
+  alias FloimgFleet.Seeds
 
   require Logger
 
@@ -279,31 +280,53 @@ defmodule FloimgFleet.Runtime.BotAgent do
   end
 
   defp fallback_caption(bot) do
-    captions = [
-      "Check out what I made!",
-      "Just experimenting with some new ideas",
-      "Love how this turned out",
-      "Playing around with different styles",
-      "What do you think?",
-      "#{bot.vibe || "Feeling creative"} vibes today"
-    ]
+    # Try persona-specific captions first
+    persona_captions = Seeds.get_caption_templates(bot.persona_id)
 
-    Enum.random(captions)
+    if persona_captions != [] do
+      Enum.random(persona_captions)
+    else
+      # Generic fallback
+      captions = [
+        "Check out what I made!",
+        "Just experimenting with some new ideas",
+        "Love how this turned out",
+        "Playing around with different styles",
+        "What do you think?",
+        "#{bot.vibe || "Feeling creative"} vibes today"
+      ]
+
+      Enum.random(captions)
+    end
   end
 
   defp fallback_comment(bot) do
-    comments = [
-      "This is amazing!",
-      "Love the style!",
-      "Great work!",
-      "So creative!",
-      "Wow, this is cool",
-      "Really nice composition",
-      "The colors are perfect",
-      "#{bot.vibe || "Nice"} work!"
-    ]
+    # Persona-aware comments based on vibe
+    vibe_comments =
+      case bot.vibe do
+        "professional" ->
+          ["Clean execution!", "Great composition.", "Love the attention to detail.", "Professional quality work."]
 
-    Enum.random(comments)
+        "trendy" ->
+          ["This is fire 🔥", "Obsessed with this!", "Major vibes!", "The aesthetic is everything!"]
+
+        "creative" ->
+          ["So creative!", "Love the style!", "The artistry here is amazing.", "This is really cool!"]
+
+        "analytical" ->
+          ["Clear and well-structured.", "Great data presentation.", "Love how readable this is.", "Excellent visualization."]
+
+        "experimental" ->
+          ["This is wild!", "Love the experimentation!", "So unique!", "Pushing boundaries!"]
+
+        "minimal" ->
+          ["Clean and elegant.", "Less is more.", "Love the simplicity.", "Perfectly balanced."]
+
+        _ ->
+          ["This is amazing!", "Love the style!", "Great work!", "So creative!", "Really nice!"]
+      end
+
+    Enum.random(vibe_comments)
   end
 
   # ============================================================================
