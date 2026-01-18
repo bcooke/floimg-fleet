@@ -19,6 +19,13 @@
         "Playing with shadows and reflections today. {adj} results!",
         "Pro tip: Always shoot at the highest resolution, then batch resize for different platforms."
       ],
+      "prompt_templates": [
+        "Professional product photography of a minimalist luxury perfume bottle on white background, soft studio lighting, commercial quality, 8k resolution",
+        "E-commerce product shot of premium wireless headphones floating on gradient background, dramatic shadows, clean composition",
+        "Hero shot of artisanal coffee beans spilling from a kraft paper bag, warm studio lighting, lifestyle product photography",
+        "Sleek smartwatch on marble surface with soft reflections, editorial product photography, Apple-style aesthetic",
+        "Premium skincare products arranged in a flatlay composition, clean white background, beauty product photography"
+      ],
       "weight": 1.5
     },
     {
@@ -39,6 +46,13 @@
         "Just created {adj} carousel content. FloImg's caption tool is clutch.",
         "Pro tip: Create your master asset at 2x resolution, then scale down for each platform.",
         "Testing new {adj} filter combinations. The algorithm loves consistency!"
+      ],
+      "prompt_templates": [
+        "Vibrant Instagram story design with bold typography saying 'NEW DROP', trendy gradient background, Gen-Z aesthetic, social media ready",
+        "Eye-catching TikTok thumbnail with neon accents, dynamic composition, influencer style, high engagement potential",
+        "Aesthetic mood board collage with pastel colors, minimalist design, Pinterest-worthy, lifestyle branding",
+        "Bold social media announcement graphic with confetti and celebration elements, brand launch vibes, viral potential",
+        "Trendy quote graphic with modern sans-serif font on textured background, shareable content, instagram carousel style"
       ],
       "weight": 1.3
     },
@@ -61,6 +75,13 @@
         "Pro tip: Always work at 16x16 or 32x32 base resolution, then scale up with nearest neighbor.",
         "Experimenting with limited color palettes. Constraints breed creativity!"
       ],
+      "prompt_templates": [
+        "Pixel art character sprite sheet for a retro platformer game, 16-bit style, idle and walking animations, vibrant limited color palette",
+        "Fantasy RPG tileset with grass, stone paths, and water tiles, top-down perspective, SNES-era aesthetic, seamless pattern",
+        "Cute pixel art monster designs for indie roguelike, 32x32 sprites, expressive animations, colorful but coherent palette",
+        "Retro game item icons including sword, potion, and treasure chest, pixel perfect, classic JRPG style",
+        "Pixel art game background of a magical forest at sunset, parallax layers, nostalgic 16-bit era vibes"
+      ],
       "weight": 1.0
     },
     {
@@ -81,6 +102,13 @@
         "Batch-exported charts for the deck - PNG for slides, SVG for print.",
         "Pro tip: Always annotate your axes and include data sources. Context is everything.",
         "Working on infographics today. {adj} visualizations make data accessible."
+      ],
+      "prompt_templates": [
+        "Clean infographic showing startup growth metrics, minimalist design, professional color scheme, executive summary style",
+        "Data visualization dashboard mockup with multiple chart types, dark mode aesthetic, modern SaaS design",
+        "Beautiful statistical chart showing climate data trends, scientific visualization, publication quality",
+        "Isometric infographic explaining a complex process with icons and flow arrows, corporate presentation style",
+        "Annual report cover design with abstract data visualization elements, premium business aesthetic"
       ],
       "weight": 0.8
     },
@@ -103,6 +131,13 @@
         "Pro tip: Start broad, then iterate. Generation → Variation → Upscale → Magic.",
         "Upscaled this 4x and the details that emerged are incredible. AI never stops surprising me."
       ],
+      "prompt_templates": [
+        "Surreal dreamscape with floating islands and bioluminescent creatures, hyperdetailed fantasy art, ethereal lighting, otherworldly atmosphere",
+        "Cyberpunk cityscape at night with neon reflections in rain puddles, Blade Runner aesthetic, cinematic composition, moody atmosphere",
+        "Abstract cosmic entity made of swirling galaxies and stardust, deep space art, vibrant nebula colors, awe-inspiring scale",
+        "Baroque still life reimagined in futuristic style, AI fusion art, classical meets sci-fi, dramatic chiaroscuro lighting",
+        "Mystical forest spirit emerging from ancient trees, fantasy creature design, magical realism, Studio Ghibli inspired atmosphere"
+      ],
       "weight": 1.2
     },
     {
@@ -123,6 +158,13 @@
         "Batch-resized mockups for different device sizes. Desktop, tablet, mobile - covered.",
         "Pro tip: Always screenshot at 2x for retina displays, then provide 1x versions too.",
         "Annotated some {adj} wireframes today. Visual specs save engineering time."
+      ],
+      "prompt_templates": [
+        "Clean mobile app UI design for a fitness tracking app, modern material design, dark mode interface, professional mockup",
+        "SaaS dashboard interface with analytics widgets, minimalist design system, Figma-style presentation, light theme",
+        "E-commerce checkout flow wireframe with annotations, user journey mapping, UX documentation style",
+        "Design system component library showcase with buttons, cards, and forms, organized grid layout, documentation quality",
+        "Mobile onboarding screens with friendly illustrations, progressive disclosure pattern, welcoming user experience"
       ],
       "weight": 1.0
     }

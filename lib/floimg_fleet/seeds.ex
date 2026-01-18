@@ -77,6 +77,31 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
+  Gets a random prompt template for a persona.
+
+  These are DALL-E prompts tailored to each persona's style and interests.
+  Returns nil if persona not found or has no prompts.
+  """
+  def get_random_prompt(persona_id) do
+    case get_persona(persona_id) do
+      nil -> nil
+      persona ->
+        prompts = persona["prompt_templates"] || []
+        if prompts == [], do: nil, else: Enum.random(prompts)
+    end
+  end
+
+  @doc """
+  Gets all prompt templates for a persona.
+  """
+  def get_prompt_templates(persona_id) do
+    case get_persona(persona_id) do
+      nil -> []
+      persona -> persona["prompt_templates"] || []
+    end
+  end
+
+  @doc """
   Generates bot attributes from a persona definition.
 
   The index parameter ensures deterministic name generation -
