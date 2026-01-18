@@ -26,6 +26,13 @@
         "Sleek smartwatch on marble surface with soft reflections, editorial product photography, Apple-style aesthetic",
         "Premium skincare products arranged in a flatlay composition, clean white background, beauty product photography"
       ],
+      "activity_schedule": {
+        "peak_hours": [[9, 12], [13, 17]],
+        "active_days": [1, 2, 3, 4, 5],
+        "timezone": "America/New_York",
+        "peak_multiplier": 2.0,
+        "off_peak_multiplier": 0.3
+      },
       "weight": 1.5
     },
     {
@@ -54,6 +61,13 @@
         "Bold social media announcement graphic with confetti and celebration elements, brand launch vibes, viral potential",
         "Trendy quote graphic with modern sans-serif font on textured background, shareable content, instagram carousel style"
       ],
+      "activity_schedule": {
+        "peak_hours": [[7, 9], [12, 14], [18, 22]],
+        "active_days": [0, 1, 2, 3, 4, 5, 6],
+        "timezone": "America/Los_Angeles",
+        "peak_multiplier": 2.5,
+        "off_peak_multiplier": 0.5
+      },
       "weight": 1.3
     },
     {
@@ -82,6 +96,13 @@
         "Retro game item icons including sword, potion, and treasure chest, pixel perfect, classic JRPG style",
         "Pixel art game background of a magical forest at sunset, parallax layers, nostalgic 16-bit era vibes"
       ],
+      "activity_schedule": {
+        "peak_hours": [[18, 24], [0, 2]],
+        "active_days": [0, 5, 6],
+        "timezone": "America/Chicago",
+        "peak_multiplier": 3.0,
+        "off_peak_multiplier": 0.4
+      },
       "weight": 1.0
     },
     {
@@ -110,6 +131,13 @@
         "Isometric infographic explaining a complex process with icons and flow arrows, corporate presentation style",
         "Annual report cover design with abstract data visualization elements, premium business aesthetic"
       ],
+      "activity_schedule": {
+        "peak_hours": [[8, 12], [14, 18]],
+        "active_days": [1, 2, 3, 4, 5],
+        "timezone": "Europe/London",
+        "peak_multiplier": 2.0,
+        "off_peak_multiplier": 0.2
+      },
       "weight": 0.8
     },
     {
@@ -138,6 +166,13 @@
         "Baroque still life reimagined in futuristic style, AI fusion art, classical meets sci-fi, dramatic chiaroscuro lighting",
         "Mystical forest spirit emerging from ancient trees, fantasy creature design, magical realism, Studio Ghibli inspired atmosphere"
       ],
+      "activity_schedule": {
+        "peak_hours": [[20, 24], [0, 4]],
+        "active_days": [0, 1, 2, 3, 4, 5, 6],
+        "timezone": "UTC",
+        "peak_multiplier": 2.0,
+        "off_peak_multiplier": 0.7
+      },
       "weight": 1.2
     },
     {
@@ -166,6 +201,13 @@
         "Design system component library showcase with buttons, cards, and forms, organized grid layout, documentation quality",
         "Mobile onboarding screens with friendly illustrations, progressive disclosure pattern, welcoming user experience"
       ],
+      "activity_schedule": {
+        "peak_hours": [[9, 12], [14, 18]],
+        "active_days": [1, 2, 3, 4, 5],
+        "timezone": "America/Los_Angeles",
+        "peak_multiplier": 2.0,
+        "off_peak_multiplier": 0.3
+      },
       "weight": 1.0
     }
   ],

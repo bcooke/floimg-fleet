@@ -104,6 +104,89 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
+  Gets the activity schedule for a persona.
+
+  Returns a map with peak_hours, active_days, timezone, and multipliers.
+  Returns nil if persona not found or has no schedule.
+  """
+  def get_activity_schedule(persona_id) do
+    case get_persona(persona_id) do
+      nil -> nil
+      persona -> persona["activity_schedule"]
+    end
+  end
+
+  @doc """
+  Calculates the activity multiplier for a persona at the current time.
+
+  The multiplier affects how quickly/slowly bots take actions:
+  - During peak hours on active days: peak_multiplier (e.g., 2.0x = twice as fast)
+  - Off-peak times: off_peak_multiplier (e.g., 0.3x = much slower)
+
+  Returns 1.0 if no schedule is defined.
+  """
+  def get_activity_multiplier(persona_id, datetime \\ nil) do
+    schedule = get_activity_schedule(persona_id)
+
+    if schedule do
+      datetime = datetime || DateTime.utc_now()
+      calculate_multiplier(schedule, datetime)
+    else
+      1.0
+    end
+  end
+
+  defp calculate_multiplier(schedule, datetime) do
+    timezone = schedule["timezone"] || "UTC"
+    peak_hours = schedule["peak_hours"] || []
+    active_days = schedule["active_days"] || [0, 1, 2, 3, 4, 5, 6]
+    peak_multiplier = schedule["peak_multiplier"] || 1.5
+    off_peak_multiplier = schedule["off_peak_multiplier"] || 0.5
+
+    # Convert UTC time to persona's timezone
+    local_datetime = convert_to_timezone(datetime, timezone)
+    hour = local_datetime.hour
+    # Sunday = 0, Monday = 1, etc. (JavaScript convention used in JSON)
+    day_of_week = day_to_js_day(Date.day_of_week(local_datetime))
+
+    is_active_day = day_of_week in active_days
+
+    is_peak_hour =
+      Enum.any?(peak_hours, fn [start_hour, end_hour] ->
+        in_hour_range?(hour, start_hour, end_hour)
+      end)
+
+    cond do
+      is_active_day and is_peak_hour -> peak_multiplier
+      is_active_day -> 1.0
+      true -> off_peak_multiplier
+    end
+  end
+
+  # Convert Elixir day_of_week (1=Monday, 7=Sunday) to JS convention (0=Sunday, 6=Saturday)
+  defp day_to_js_day(7), do: 0
+  defp day_to_js_day(day), do: day
+
+  # Check if hour is within range, handling midnight wraparound
+  defp in_hour_range?(hour, start_hour, end_hour) when end_hour > start_hour do
+    hour >= start_hour and hour < end_hour
+  end
+
+  defp in_hour_range?(hour, start_hour, end_hour) do
+    # Handles ranges like [20, 2] meaning 8pm to 2am
+    hour >= start_hour or hour < end_hour
+  end
+
+  # Convert datetime to a specific timezone
+  # Falls back to UTC if timezone is invalid
+  defp convert_to_timezone(datetime, timezone) do
+    case DateTime.shift_zone(datetime, timezone) do
+      {:ok, local} -> local
+      {:error, _} -> datetime
+    end
+  end
+
+  @doc """
   Generates bot attributes from a persona definition.
 
   The index parameter ensures deterministic name generation -
