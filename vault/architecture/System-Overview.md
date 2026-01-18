@@ -86,6 +86,54 @@ FloimgFleet.Application
 └─────────────────┘     └──────────────────┘
 ```
 
+## Key Features
+
+### Persona System
+
+Bots are generated from 6 predefined user archetypes defined in `priv/seeds/personas.json`:
+
+| Persona | Vibe | Typical Use Case |
+|---------|------|------------------|
+| Product Photographer | professional | E-commerce packshots, lifestyle |
+| Social Media Marketer | trendy | Instagram, TikTok content |
+| Indie Game Dev | creative | Pixel art, sprites |
+| Data Visualization | analytical | Charts, infographics |
+| AI Art Enthusiast | experimental | DALL-E, Midjourney styles |
+| UX/UI Designer | minimal | Mockups, prototypes |
+
+Each persona has:
+- Name templates for deterministic generation
+- Personality and vibe descriptions (for LLM prompts)
+- Workflow type preferences
+- Action probabilities (post/comment/like)
+- Activity schedules (timezone, peak hours)
+
+See: [[Persona-System]]
+
+### Activity Schedules
+
+Bots operate on timezone-aware schedules matching their persona:
+
+- Product photographers: Business hours EST
+- Social marketers: Engagement hours (7-9am, 12-2pm, 6-9pm) all week
+- Indie game devs: Evenings/weekends CST
+- AI artists: Late night (creative hours) UTC
+
+During peak hours, action intervals are multiplied (faster). Off-peak, bots slow down or go dormant.
+
+See: [[Activity-Schedules]]
+
+### Real Workflow Execution
+
+Bots generate actual images via FloImg workflows:
+1. LLM generates a DALL-E prompt based on persona
+2. Bot executes a generation workflow via FSC API
+3. Result image is posted to the gallery with LLM-generated caption
+
+Falls back to placeholder images if workflow execution fails.
+
+See: [[FSC-Integration]]
+
 ## Key Decisions
 
 ### Bot State Split
@@ -99,6 +147,7 @@ FloimgFleet.Application
 ### Probabilistic Behavior
 - Each bot has configurable probabilities for post/comment/like/browse
 - Action intervals randomized within configured min/max bounds
+- Schedule multiplier adjusts intervals based on time of day
 - Creates human-like unpredictable behavior
 
 ## Technology Stack
@@ -117,6 +166,7 @@ FloimgFleet.Application
 
 ## Related Documents
 
-- [[Bot-Schema]] - Database schema design
-- [[Admin-Panel]] - LiveView admin interface
-- [[FloImg-API-Integration]] - API client for FloImg
+- [[Persona-System]] - Persona definitions and bot generation
+- [[Activity-Schedules]] - Timezone-aware activity patterns
+- [[FSC-Integration]] - FloImg Studio Cloud API integration
+- [[LLM-Content-Generation]] - LLM prompts and content strategies

@@ -58,9 +58,31 @@ New social platforms face a chicken-and-egg problem: users leave if there's no a
 3. **Observable** - Real-time dashboard for monitoring
 4. **Controllable** - Start, pause, resume individual bots or all at once
 5. **Resilient** - Bots recover from errors, supervisor restarts failed processes
+6. **Reproducible** - Same seed data produces same bots across environments
+
+## Persona System
+
+Bots are generated from 6 user archetypes:
+
+| Persona | Vibe | Active Hours |
+|---------|------|--------------|
+| Product Photographer | professional | Business hours EST |
+| Social Media Marketer | trendy | Engagement peaks PST |
+| Indie Game Dev | creative | Evenings/weekends CST |
+| Data Visualization | analytical | Business hours GMT |
+| AI Art Enthusiast | experimental | Late night UTC |
+| UX/UI Designer | minimal | Business hours PST |
+
+Each persona has distinct:
+- Personality and interests (for LLM prompts)
+- Workflow preferences (for image generation)
+- Activity schedules (timezone-aware)
+- Action probabilities (post/comment/like)
 
 ## Related Documentation
 
 - [[System-Overview]] - Architecture deep dive
-- [[Bot-Schema]] - Database schema design
-- [[Admin-Panel]] - LiveView admin interface
+- [[Persona-System]] - Persona definitions and generation
+- [[Activity-Schedules]] - Timezone-aware activity patterns
+- [[FSC-Integration]] - FloImg Studio Cloud integration
+- [[LLM-Content-Generation]] - Content generation strategies
