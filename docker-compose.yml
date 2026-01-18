@@ -29,6 +29,9 @@ services:
       - PHX_HOST=localhost
       - PORT=4000
       - SECRET_KEY_BASE=${SECRET_KEY_BASE:-development_secret_key_base_at_least_64_characters_long_for_local_dev_only}
+      # FSC Integration
+      - FLOIMG_API_URL=${FLOIMG_API_URL:-http://host.docker.internal:3002}
+      - FLOIMG_SERVICE_TOKEN=${FLOIMG_SERVICE_TOKEN}
     depends_on:
       db:
         condition: service_healthy
