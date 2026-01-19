@@ -35,7 +35,7 @@ defmodule FloimgFleetWeb.Router do
   scope "/api", FloimgFleetWeb do
     pipe_through :api
 
-    # Bot management endpoints will go here
+    # Agent management endpoints will go here
   end
 
   # Enable LiveDashboard in development

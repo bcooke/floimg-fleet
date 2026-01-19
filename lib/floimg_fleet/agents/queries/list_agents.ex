@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Queries.ListAgents do
   @moduledoc """
-  Query to list bots with filtering and pagination.
+  Query to list agents with filtering and pagination.
 
   ## Examples
 
@@ -26,7 +26,7 @@ defmodule FloimgFleet.Agents.Queries.ListAgents do
   @spec execute(params()) :: [Agent.t()] | %{entries: [Agent.t()], total_count: non_neg_integer()}
   def execute(params \\ %{}) do
     query =
-      Bot
+      Agent
       |> maybe_filter_status(params)
       |> maybe_exclude_deleted(params)
       |> order_by([b], desc: b.inserted_at)

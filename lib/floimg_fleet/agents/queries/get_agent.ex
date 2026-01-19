@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Queries.GetAgent do
   @moduledoc """
-  Query to get a single bot by ID.
+  Query to get a single agent by ID.
   """
 
   alias FloimgFleet.Repo
@@ -8,14 +8,14 @@ defmodule FloimgFleet.Agents.Queries.GetAgent do
 
   @spec execute(String.t()) :: {:ok, Agent.t()} | {:error, :not_found}
   def execute(id) do
-    case Repo.get(Bot, id) do
+    case Repo.get(Agent, id) do
       nil -> {:error, :not_found}
-      bot -> {:ok, bot}
+      agent -> {:ok, agent}
     end
   end
 
   @spec execute!(String.t()) :: Agent.t()
   def execute!(id) do
-    Repo.get!(Bot, id)
+    Repo.get!(Agent, id)
   end
 end

@@ -211,7 +211,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
             Start All
           </button>
           <.link navigate={~p"/bots/new"} class="btn btn-primary btn-sm">
-            New Bot
+            New Agent
           </.link>
         </div>
       </div>

@@ -22,7 +22,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
       {:error, :not_found} ->
         {:ok,
          socket
-         |> put_flash(:error, "Bot not found")
+         |> put_flash(:error, "Agent not found")
          |> push_navigate(to: ~p"/bots")}
     end
   end

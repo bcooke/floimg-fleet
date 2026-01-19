@@ -16,7 +16,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
             field={@form[:name]}
             type="text"
             label="Name"
-            placeholder="Bot name"
+            placeholder="Agent name"
             class="input input-bordered w-full"
             error_class="input-error"
           />

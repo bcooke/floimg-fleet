@@ -1,8 +1,8 @@
 defmodule FloimgFleet.Agents.Schemas.Agent do
   @moduledoc """
-  Schema for a bot configuration.
+  Schema for an agent configuration.
 
-  Bots are persisted configurations that define personality, behavior,
+  Agents are persisted configurations that define personality, behavior,
   and settings. Runtime state is managed by GenServer processes.
   """
 
@@ -14,12 +14,12 @@ defmodule FloimgFleet.Agents.Schemas.Agent do
 
   @statuses [:idle, :running, :paused, :error]
 
-  schema "bots" do
+  schema "agents" do
     field(:name, :string)
     field(:username, :string)
     field(:status, Ecto.Enum, values: @statuses, default: :idle)
 
-    # Persona reference (for seeded bots)
+    # Persona reference (for seeded agents)
     field(:persona_id, :string)
 
     # Personality traits (LLM-generated or configured)
@@ -67,8 +67,8 @@ defmodule FloimgFleet.Agents.Schemas.Agent do
     :deleted_at
   ]
 
-  def changeset(bot, attrs) do
-    bot
+  def changeset(agent, attrs) do
+    agent
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:name, min: 1, max: 100)
@@ -98,7 +98,7 @@ defmodule FloimgFleet.Agents.Schemas.Agent do
 
   # Convenience functions
 
-  def active?(bot), do: is_nil(bot.deleted_at)
-  def running?(bot), do: bot.status == :running
-  def paused?(bot), do: bot.status == :paused
+  def active?(agent), do: is_nil(agent.deleted_at)
+  def running?(agent), do: agent.status == :running
+  def paused?(agent), do: agent.status == :paused
 end
