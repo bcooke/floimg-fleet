@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
 
   use Mix.Task
 
-  alias FloimgFleet.Bots
+  alias FloimgFleet.Agents
 
   @requirements ["app.start"]
 
@@ -56,7 +56,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
   end
 
   defp start_all do
-    bots = Bots.list_bots()
+    bots = Agents.list_agents()
     startable = Enum.filter(bots, &can_start?/1)
 
     if Enum.empty?(startable) do
@@ -65,7 +65,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
       Mix.shell().info("Starting #{length(startable)} bots...")
 
       Enum.each(startable, fn bot ->
-        case Bots.start_bot(bot.id) do
+        case Agents.start_agent(bot.id) do
           {:ok, _} ->
             Mix.shell().info("  ✓ Started: #{bot.name}")
 
@@ -77,7 +77,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
   end
 
   defp start_by_persona(persona_id) do
-    bots = Bots.list_bots()
+    bots = Agents.list_agents()
     persona_bots = Enum.filter(bots, fn bot -> bot.persona_id == persona_id end)
     startable = Enum.filter(persona_bots, &can_start?/1)
 
@@ -90,7 +90,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
         Mix.shell().info("Starting #{length(startable)} #{persona_id} bots...")
 
         Enum.each(startable, fn bot ->
-          case Bots.start_bot(bot.id) do
+          case Agents.start_agent(bot.id) do
             {:ok, _} ->
               Mix.shell().info("  ✓ Started: #{bot.name}")
 
@@ -103,7 +103,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
   end
 
   defp stop_all do
-    case Bots.pause_all() do
+    case Agents.pause_all() do
       {:ok, count} ->
         Mix.shell().info("Stopped #{count} bots")
 
@@ -113,7 +113,7 @@ defmodule Mix.Tasks.Fleet.Swarm do
   end
 
   defp show_status do
-    bots = Bots.list_bots()
+    bots = Agents.list_agents()
 
     by_status =
       Enum.group_by(bots, & &1.status)

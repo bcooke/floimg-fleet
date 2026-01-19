@@ -2,7 +2,7 @@ defmodule FloimgFleet.Repo.Migrations.CreateBots do
   use Ecto.Migration
 
   def change do
-    create table(:bots, primary_key: false) do
+    create table(:agents, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :name, :string, null: false
       add :username, :string, null: false
@@ -33,8 +33,8 @@ defmodule FloimgFleet.Repo.Migrations.CreateBots do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:bots, [:username])
-    create index(:bots, [:status])
-    create index(:bots, [:deleted_at])
+    create unique_index(:agents, [:username])
+    create index(:agents, [:status])
+    create index(:agents, [:deleted_at])
   end
 end

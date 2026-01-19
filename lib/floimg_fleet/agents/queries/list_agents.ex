@@ -1,11 +1,11 @@
-defmodule FloimgFleet.Bots.Queries.ListBots do
+defmodule FloimgFleet.Agents.Queries.ListAgents do
   @moduledoc """
   Query to list bots with filtering and pagination.
 
   ## Examples
 
       iex> execute(%{status: :running})
-      [%Bot{status: :running}, ...]
+      [%Agent{status: :running}, ...]
 
       iex> execute(%{page: 1, per_page: 10})
       %{entries: [...], total_count: 42}
@@ -14,7 +14,7 @@ defmodule FloimgFleet.Bots.Queries.ListBots do
 
   import Ecto.Query
   alias FloimgFleet.Repo
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents.Schemas.Agent
 
   @type params :: %{
           optional(:status) => atom(),
@@ -23,7 +23,7 @@ defmodule FloimgFleet.Bots.Queries.ListBots do
           optional(:include_deleted) => boolean()
         }
 
-  @spec execute(params()) :: [Bot.t()] | %{entries: [Bot.t()], total_count: non_neg_integer()}
+  @spec execute(params()) :: [Agent.t()] | %{entries: [Agent.t()], total_count: non_neg_integer()}
   def execute(params \\ %{}) do
     query =
       Bot

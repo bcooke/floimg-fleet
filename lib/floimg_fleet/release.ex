@@ -29,7 +29,7 @@ defmodule FloimgFleet.Release do
   def seed(count \\ 6, opts \\ []) do
     load_app()
     start_app()
-    FloimgFleet.Seeds.seed_bots(count, opts)
+    FloimgFleet.Seeds.seed_agents(count, opts)
   end
 
   defp start_app do

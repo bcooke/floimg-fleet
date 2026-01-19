@@ -1,10 +1,10 @@
 # FloImg Fleet - Claude Code Quick Reference
 
-FloImg Fleet is a bot orchestration system for simulating user activity on FloImg Studio's gallery features.
+FloImg Fleet is an agent orchestration system for simulating user activity on FloImg Studio's gallery features.
 
 ## What This Project Does
 
-LLM-driven bots that:
+LLM-driven agents that:
 - Create and share images in the gallery
 - Upvote and interact with content
 - Leave comments
@@ -29,23 +29,23 @@ This solves the cold-start problem for FloImg Studio's social features.
 
 ```
 lib/floimg_fleet/
-├── bots.ex                    # Context gateway (CQRS)
-├── bots/
+├── agents.ex                  # Context gateway (CQRS)
+├── agents/
 │   ├── commands/              # Write operations
-│   │   ├── create_bot.ex
-│   │   ├── start_bot.ex
-│   │   ├── pause_bot.ex
+│   │   ├── create_agent.ex
+│   │   ├── start_agent.ex
+│   │   ├── pause_agent.ex
 │   │   └── ...
 │   ├── queries/               # Read operations
-│   │   ├── list_bots.ex
-│   │   ├── get_bot.ex
+│   │   ├── list_agents.ex
+│   │   ├── get_agent.ex
 │   │   └── get_activity.ex
 │   └── schemas/               # Ecto schemas
-│       ├── bot.ex
-│       └── bot_activity.ex
+│       ├── agent.ex
+│       └── agent_activity.ex
 ├── runtime/                   # OTP supervision
-│   ├── bot_supervisor.ex      # DynamicSupervisor
-│   └── bot_agent.ex           # GenServer per bot
+│   ├── agent_supervisor.ex    # DynamicSupervisor
+│   └── agent_worker.ex        # GenServer per agent
 └── repo.ex                    # Ecto repository
 
 lib/floimg_fleet_web/          # Phoenix web interface
@@ -65,40 +65,40 @@ vault/                         # PM artifacts and documentation
 Write operations go through Commands, read operations through Queries:
 
 ```elixir
-# Write: Create a bot
-FloimgFleet.Bots.create_bot(%{name: "Bot1", personality: "friendly"})
+# Write: Create an agent
+FloimgFleet.Agents.create_agent(%{name: "Agent1", personality: "friendly"})
 
-# Read: List all bots
-FloimgFleet.Bots.list_bots()
+# Read: List all agents
+FloimgFleet.Agents.list_agents()
 ```
 
-The `FloimgFleet.Bots` context module is the public API gateway - it delegates to specific command/query modules.
+The `FloimgFleet.Agents` context module is the public API gateway - it delegates to specific command/query modules.
 
-### GenServer Per Bot
+### GenServer Per Agent
 
-Each bot runs as a supervised GenServer process:
+Each agent runs as a supervised GenServer process:
 
 ```
 FloimgFleet.Application
 ├── FloimgFleet.Repo
 ├── Phoenix.PubSub
-├── FloimgFleet.Runtime.BotSupervisor
-│   ├── BotAgent (bot 1)
-│   ├── BotAgent (bot 2)
+├── FloimgFleet.Runtime.AgentSupervisor
+│   ├── AgentWorker (agent 1)
+│   ├── AgentWorker (agent 2)
 │   └── ...
 └── FloimgFleetWeb.Endpoint
 ```
 
-Bot lifecycle:
-1. Configuration stored in Postgres (`bots` table)
-2. Start bot → spawns GenServer process via DynamicSupervisor
-3. Bot "thinks" periodically, decides actions based on probabilities
-4. Actions logged to `bot_activities` table and broadcast via PubSub
+Agent lifecycle:
+1. Configuration stored in Postgres (`agents` table)
+2. Start agent → spawns GenServer process via DynamicSupervisor
+3. Agent "thinks" periodically, decides actions based on probabilities
+4. Actions logged to `agent_activities` table and broadcast via PubSub
 5. Pause/resume/stop controls GenServer state
 
 ### Probabilistic Behavior
 
-Each bot has configurable probabilities:
+Each agent has configurable probabilities:
 - `post_probability` - Chance to create a new post
 - `comment_probability` - Chance to leave a comment
 - `like_probability` - Chance to like content
@@ -168,12 +168,12 @@ docker run -p 4000:4000 \
 
 | Module | Purpose |
 |--------|---------|
-| `FloimgFleet.Bots` | Context gateway - public API |
-| `FloimgFleet.Bots.Schemas.Bot` | Ecto schema for bot configuration |
-| `FloimgFleet.Bots.Schemas.BotActivity` | Ecto schema for activity logs |
-| `FloimgFleet.Runtime.BotSupervisor` | DynamicSupervisor for bot processes |
-| `FloimgFleet.Runtime.BotAgent` | GenServer for individual bot state |
-| `FloimgFleet.LLM.Client` | LLM client for generating bot content (Ollama/OpenAI) |
+| `FloimgFleet.Agents` | Context gateway - public API |
+| `FloimgFleet.Agents.Schemas.Agent` | Ecto schema for agent configuration |
+| `FloimgFleet.Agents.Schemas.AgentActivity` | Ecto schema for activity logs |
+| `FloimgFleet.Runtime.AgentSupervisor` | DynamicSupervisor for agent processes |
+| `FloimgFleet.Runtime.AgentWorker` | GenServer for individual agent state |
+| `FloimgFleet.LLM.Client` | LLM client for generating agent content (Ollama/OpenAI) |
 
 ## Git Workflow
 
@@ -184,7 +184,7 @@ docker run -p 4000:4000 \
 ## Critical Rules
 
 1. **Cost efficiency** - Minimize LLM tokens and API calls
-2. **Human-like behavior** - Bots should not be detectable as bots
+2. **Human-like behavior** - Agents should not be detectable as automated
 3. **No Claude co-authorship** - Never add `Co-Authored-By: Claude` in commits
 4. **Private repo** - This code should never be public
 
@@ -192,7 +192,7 @@ docker run -p 4000:4000 \
 
 Located in `_reference/`:
 - `flojo/` - CQRS patterns from Flojo project
-- `shinstagram/` - GenServer bot patterns (Charlie Holtz)
+- `shinstagram/` - GenServer patterns (Charlie Holtz)
 - `goflojo/` - Dockerfile and Coolify deployment patterns
 
 ## Vault Documentation

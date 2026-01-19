@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Bots.Schemas.BotActivity do
+defmodule FloimgFleet.Agents.Schemas.AgentActivity do
   @moduledoc """
   Schema for bot activity logs.
 
@@ -15,7 +15,7 @@ defmodule FloimgFleet.Bots.Schemas.BotActivity do
   @event_types [:thought, :action, :post, :comment, :like, :error, :started, :paused, :stopped]
 
   schema "bot_activities" do
-    belongs_to(:bot, FloimgFleet.Bots.Schemas.Bot)
+    belongs_to(:bot, FloimgFleet.Agents.Schemas.Agent)
 
     field(:event_type, Ecto.Enum, values: @event_types)
     field(:message, :string)
@@ -27,7 +27,7 @@ defmodule FloimgFleet.Bots.Schemas.BotActivity do
     timestamps(type: :utc_datetime, updated_at: false)
   end
 
-  @required_fields [:bot_id, :event_type, :message]
+  @required_fields [:agent_id, :event_type, :message]
   @optional_fields [:emoji, :metadata]
 
   def changeset(activity, attrs) do
@@ -35,6 +35,6 @@ defmodule FloimgFleet.Bots.Schemas.BotActivity do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> validate_length(:message, max: 1000)
-    |> foreign_key_constraint(:bot_id)
+    |> foreign_key_constraint(:agent_id)
   end
 end

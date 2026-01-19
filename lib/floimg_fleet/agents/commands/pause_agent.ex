@@ -1,22 +1,22 @@
-defmodule FloimgFleet.Bots.Commands.PauseBot do
+defmodule FloimgFleet.Agents.Commands.PauseAgent do
   @moduledoc """
   Command to pause a running bot.
   """
 
-  alias FloimgFleet.Bots.Queries.GetBot
-  alias FloimgFleet.Runtime.BotAgent
+  alias FloimgFleet.Agents.Queries.GetAgent
+  alias FloimgFleet.Runtime.AgentWorker
 
-  defstruct [:bot_id]
+  defstruct [:agent_id]
 
-  @type t :: %__MODULE__{bot_id: String.t()}
+  @type t :: %__MODULE__{agent_id: String.t()}
 
   @spec execute(t()) :: :ok | {:error, term()}
-  def execute(%__MODULE__{bot_id: bot_id}) do
-    case GetBot.execute(bot_id) do
+  def execute(%__MODULE__{agent_id: agent_id}) do
+    case GetAgent.execute(agent_id) do
       {:ok, bot} ->
         if bot.pid do
           pid = string_to_pid(bot.pid)
-          BotAgent.pause(pid)
+          AgentWorker.pause(pid)
           :ok
         else
           {:error, :bot_not_running}

@@ -75,11 +75,12 @@ defmodule FloimgFleet.FloImgAPI.Interactions do
 
     case Client.get(agent, path) do
       {:ok, %{"comments" => comments}} ->
-        {:ok, %{
-          "comments" => Enum.map(comments, &normalize_comment/1),
-          "page" => page,
-          "per_page" => per_page
-        }}
+        {:ok,
+         %{
+           "comments" => Enum.map(comments, &normalize_comment/1),
+           "page" => page,
+           "per_page" => per_page
+         }}
 
       error ->
         error

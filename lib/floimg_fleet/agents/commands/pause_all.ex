@@ -1,10 +1,10 @@
-defmodule FloimgFleet.Bots.Commands.PauseAll do
+defmodule FloimgFleet.Agents.Commands.PauseAll do
   @moduledoc """
   Command to pause all running bots.
   """
 
-  alias FloimgFleet.Runtime.BotSupervisor
-  alias FloimgFleet.Runtime.BotAgent
+  alias FloimgFleet.Runtime.AgentSupervisor
+  alias FloimgFleet.Runtime.AgentWorker
 
   defstruct []
 
@@ -12,10 +12,10 @@ defmodule FloimgFleet.Bots.Commands.PauseAll do
 
   @spec execute(t()) :: {:ok, non_neg_integer()}
   def execute(%__MODULE__{}) do
-    pids = BotSupervisor.list_children()
+    pids = AgentSupervisor.list_children()
 
     for pid <- pids do
-      BotAgent.pause(pid)
+      AgentWorker.pause(pid)
     end
 
     {:ok, length(pids)}
