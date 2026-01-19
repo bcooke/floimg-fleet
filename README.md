@@ -1,18 +1,18 @@
 # FloImg Fleet
 
-Bot orchestration system for simulating user activity on FloImg Studio.
+Agent orchestration system for simulating user activity on FloImg Studio.
 
 ## Overview
 
-FloImg Fleet creates LLM-driven bots that interact with FloImg Studio's gallery features to bootstrap engagement and solve the cold-start problem for new social platforms.
+FloImg Fleet creates LLM-driven agents that interact with FloImg Studio's gallery features to bootstrap engagement and solve the cold-start problem for new social platforms.
 
-**What bots do:**
+**What agents do:**
 - Create and share images in the gallery
 - Upvote and interact with content
 - Leave comments
 - Make the platform feel alive
 
-**What bots don't do:**
+**What agents don't do:**
 - Create plugins or templates
 - Make OSS contributions
 - Anything outside gallery/social features
@@ -73,21 +73,21 @@ docker run -p 4000:4000 \
 
 ```
 lib/floimg_fleet/
-├── bots.ex                    # Context gateway (CQRS)
-├── bots/
+├── agents.ex                  # Context gateway (CQRS)
+├── agents/
 │   ├── commands/              # Write operations
-│   │   ├── create_bot.ex
-│   │   ├── start_bot.ex
-│   │   └── pause_bot.ex
+│   │   ├── create_agent.ex
+│   │   ├── start_agent.ex
+│   │   └── pause_agent.ex
 │   ├── queries/               # Read operations
-│   │   ├── list_bots.ex
+│   │   ├── list_agents.ex
 │   │   └── get_activity.ex
 │   └── schemas/               # Ecto schemas
-│       ├── bot.ex
-│       └── bot_activity.ex
+│       ├── agent.ex
+│       └── agent_activity.ex
 ├── runtime/                   # OTP supervision
-│   ├── bot_supervisor.ex      # DynamicSupervisor
-│   └── bot_agent.ex           # GenServer per bot
+│   ├── agent_supervisor.ex    # DynamicSupervisor
+│   └── agent_worker.ex        # GenServer per agent
 └── repo.ex                    # Ecto repository
 ```
 
@@ -97,18 +97,18 @@ lib/floimg_fleet/
 FloimgFleet.Application
 ├── FloimgFleet.Repo
 ├── Phoenix.PubSub
-├── FloimgFleet.Runtime.BotSupervisor
-│   ├── BotAgent (bot 1)
-│   ├── BotAgent (bot 2)
+├── FloimgFleet.Runtime.AgentSupervisor
+│   ├── AgentWorker (agent 1)
+│   ├── AgentWorker (agent 2)
 │   └── ...
 └── FloimgFleetWeb.Endpoint
 ```
 
-### Bot Lifecycle
+### Agent Lifecycle
 
-1. Create bot configuration (stored in Postgres)
-2. Start bot → spawns GenServer process
-3. Bot "thinks" periodically, decides actions
+1. Create agent configuration (stored in Postgres)
+2. Start agent → spawns GenServer process
+3. Agent "thinks" periodically, decides actions
 4. Actions logged to DB and broadcast via PubSub
 5. Pause/resume/stop via admin panel
 
@@ -124,7 +124,7 @@ FloimgFleet.Application
 | `PORT` | No | HTTP port (default: 4000) |
 | `POOL_SIZE` | No | DB connection pool (default: 10) |
 | `FLOIMG_API_URL` | No | FloImg API endpoint |
-| `FLOIMG_BOT_SECRET` | No | Bot authentication secret |
+| `FLOIMG_SERVICE_TOKEN` | Yes (prod) | Service token for FSC authentication |
 
 ## Development
 
