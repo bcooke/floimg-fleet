@@ -77,7 +77,7 @@ defmodule FloimgFleet.FloImgAPI.Client do
       end
 
     # Add bot username header so the API can look up the bot's FSC user
-    # Uses username instead of ID because FSC users are provisioned with email: {username}@bot.floimg.local
+    # Uses username instead of ID because FSC users are provisioned with email: {username}@agent.floimg.local
     if bot do
       [{"x-bot-id", bot.username} | headers]
     else
@@ -107,7 +107,34 @@ defmodule FloimgFleet.FloImgAPI.Client do
   end
 
   defp handle_response({:ok, %Req.Response{status: 429, body: body}}) do
-    {:error, {:rate_limited, body["error"] || "Rate limited"}}
+    # Handle Fleet budget error codes
+    case body["code"] do
+      "FLEET_DAILY_BUDGET_EXCEEDED" ->
+        {:error, {:fleet_daily_budget, body["resetAt"]}}
+
+      "FLEET_MONTHLY_BUDGET_EXCEEDED" ->
+        {:error, {:fleet_monthly_budget, body["resetAt"]}}
+
+      "AGENT_DAILY_LIMIT_EXCEEDED" ->
+        {:error, {:agent_daily_limit, body}}
+
+      "AGENT_MONTHLY_LIMIT_EXCEEDED" ->
+        {:error, {:agent_monthly_limit, body}}
+
+      _ ->
+        {:error, {:rate_limited, body["error"] || "Rate limited"}}
+    end
+  end
+
+  defp handle_response({:ok, %Req.Response{status: 503, body: body}}) do
+    # Handle Fleet paused (killswitch)
+    case body["code"] do
+      "FLEET_PAUSED" ->
+        {:error, {:fleet_paused, body["error"]}}
+
+      _ ->
+        {:error, {:service_unavailable, body["error"] || "Service unavailable"}}
+    end
   end
 
   defp handle_response({:ok, %Req.Response{status: status, body: body}})

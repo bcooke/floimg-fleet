@@ -34,11 +34,11 @@ defmodule FloimgFleet.FloImgAPI.Users do
   """
   def provision_bot_user(%Bot{} = bot) do
     body = %{
-      botId: bot.id,
+      agentId: bot.id,
       name: bot.name,
       username: bot.username,
-      isBot: true,
-      botPersonaId: bot.persona_id
+      isAgent: true,
+      agentPersonaId: bot.persona_id
     }
 
     # Use nil for bot param since this is a service-level call
