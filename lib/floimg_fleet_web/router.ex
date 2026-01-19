@@ -17,8 +17,7 @@ defmodule FloimgFleetWeb.Router do
   scope "/", FloimgFleetWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-
+    live "/", BotLive.Index, :index
     live "/bots", BotLive.Index, :index
     live "/bots/new", BotLive.Index, :new
     live "/bots/:id", BotLive.Show, :show
