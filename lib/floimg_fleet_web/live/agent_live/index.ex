@@ -16,7 +16,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Bots")
+     |> assign(:page_title, "Agents")
      |> assign(:activities_empty, true)
      |> assign(:persona_filter, nil)
      |> assign(:persona_stats, persona_stats)
@@ -32,13 +32,13 @@ defmodule FloimgFleetWeb.AgentLive.Index do
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Bots")
+    |> assign(:page_title, "Agents")
     |> assign(:bot, nil)
   end
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Bot")
+    |> assign(:page_title, "New Agent")
     |> assign(:bot, %Agent{})
   end
 
@@ -51,7 +51,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
 
       {:error, :not_found} ->
         socket
-        |> put_flash(:error, "Bot not found")
+        |> put_flash(:error, "Agent not found")
         |> push_navigate(to: ~p"/bots")
     end
   end
@@ -75,16 +75,16 @@ defmodule FloimgFleetWeb.AgentLive.Index do
      |> stream_insert(:activities, activity_with_id, at: 0)}
   end
 
-  def handle_info({:bot_started, bot}, socket) do
-    {:noreply, stream_insert(socket, :agents, bot)}
+  def handle_info({:agent_started, agent}, socket) do
+    {:noreply, stream_insert(socket, :agents, agent)}
   end
 
-  def handle_info({:bot_stopped, bot}, socket) do
-    {:noreply, stream_insert(socket, :agents, bot)}
+  def handle_info({:agent_stopped, agent}, socket) do
+    {:noreply, stream_insert(socket, :agents, agent)}
   end
 
-  def handle_info({:bot_updated, bot}, socket) do
-    {:noreply, stream_insert(socket, :agents, bot)}
+  def handle_info({:agent_updated, agent}, socket) do
+    {:noreply, stream_insert(socket, :agents, agent)}
   end
 
   @impl true
@@ -94,10 +94,10 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         {:noreply,
          socket
          |> stream_insert(:agents, bot)
-         |> put_flash(:info, "Bot #{bot.name} started")}
+         |> put_flash(:info, "Agent started")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to start bot: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to start agent: #{reason}")}
     end
   end
 
@@ -109,10 +109,10 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         {:noreply,
          socket
          |> stream_insert(:agents, bot)
-         |> put_flash(:info, "Bot #{bot.name} paused")}
+         |> put_flash(:info, "Agent paused")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to pause bot: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to pause agent: #{reason}")}
     end
   end
 
@@ -122,10 +122,10 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         {:noreply,
          socket
          |> stream_delete(:agents, bot)
-         |> put_flash(:info, "Bot #{bot.name} deleted")}
+         |> put_flash(:info, "Agent deleted")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to delete bot: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to delete agent: #{reason}")}
     end
   end
 
@@ -182,7 +182,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h1 class="text-2xl font-bold">Bot Fleet</h1>
+          <h1 class="text-2xl font-bold">Agent Fleet</h1>
           <div class="flex gap-2 mt-2">
             <%= for {persona, count} <- @persona_stats do %>
               <span class="badge badge-outline badge-sm">
@@ -220,7 +220,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         <div class="lg:col-span-2">
           <div class="card bg-base-200">
             <div class="card-body">
-              <h2 class="card-title">Bots</h2>
+              <h2 class="card-title">Agents</h2>
               <div class="overflow-x-auto">
                 <table class="table table-zebra">
                   <thead>
@@ -233,8 +233,8 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="bots" phx-update="stream">
-                    <tr :for={{dom_id, bot} <- @streams.bots} id={dom_id}>
+                  <tbody id="agents" phx-update="stream">
+                    <tr :for={{dom_id, bot} <- @streams.agents} id={dom_id}>
                       <td>
                         <.link navigate={~p"/bots/#{bot.id}"} class="link link-hover">
                           {bot.name}
@@ -278,7 +278,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                           <button
                             phx-click="delete"
                             phx-value-id={bot.id}
-                            data-confirm="Are you sure you want to delete this bot?"
+                            data-confirm="Are you sure you want to delete this agent?"
                             class="btn btn-error btn-xs"
                           >
                             Delete
@@ -320,7 +320,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
       </div>
     </div>
 
-    <.modal :if={@live_action in [:new, :edit]} id="bot-modal" show on_cancel={JS.navigate(~p"/bots")}>
+    <.modal :if={@live_action in [:new, :edit]} id="agent-modal" show on_cancel={JS.navigate(~p"/bots")}>
       <.live_component
         module={FloimgFleetWeb.AgentLive.FormComponent}
         id={@bot.id || :new}

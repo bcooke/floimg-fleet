@@ -1,8 +1,8 @@
 defmodule FloimgFleet.Runtime.AgentWorker do
   @moduledoc """
-  GenServer for an individual bot.
+  GenServer for an individual agent.
 
-  Each bot agent manages its own lifecycle:
+  Each agent manages its own lifecycle:
   - Subscribes to the activity feed
   - Periodically decides on actions (post, comment, like, browse)
   - Logs activity to the database and broadcasts via PubSub
@@ -10,9 +10,9 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   ## State
 
   The agent maintains:
-  - `bot`: The bot configuration from database
+  - `agent`: The agent configuration from database
   - `last_action`: The last action taken
-  - `paused`: Whether the bot is paused
+  - `paused`: Whether the agent is paused
 
   ## Lifecycle
 
@@ -43,8 +43,8 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   # Client API
   # ============================================================================
 
-  def start_link(%Agent{} = bot) do
-    GenServer.start_link(__MODULE__, bot)
+  def start_link(%Agent{} = agent) do
+    GenServer.start_link(__MODULE__, agent)
   end
 
   def pause(pid) do
@@ -64,20 +64,20 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   # ============================================================================
 
   @impl true
-  def init(bot) do
+  def init(agent) do
     # Subscribe to the activity channel
     Phoenix.PubSub.subscribe(FloimgFleet.PubSub, @channel)
 
-    # Update bot status in database
-    update_agent_status(bot, :running, self())
+    # Update agent status in database
+    update_agent_status(agent, :running, self())
 
     # Broadcast that we're waking up
-    broadcast(:started, "Waking up!", bot)
+    broadcast(:started, "Waking up!", agent)
 
     # Schedule first think
     schedule_think(@default_think_delay)
 
-    {:ok, %{bot: bot, last_action: nil, paused: false}}
+    {:ok, %{agent: agent, last_action: nil, paused: false}}
   end
 
   @impl true
@@ -87,48 +87,48 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     {:noreply, state}
   end
 
-  def handle_info(:wake, %{bot: bot} = state) do
+  def handle_info(:wake, %{agent: agent} = state) do
     # Resume from budget-limited sleep
-    broadcast(:started, "Waking up from budget sleep!", bot)
-    update_agent_status(bot, :running, self())
+    broadcast(:started, "Waking up from budget sleep!", agent)
+    update_agent_status(agent, :running, self())
     schedule_think(@default_think_delay)
     {:noreply, %{state | paused: false}}
   end
 
-  def handle_info(:think, %{bot: bot} = state) do
-    action = decide_action(bot)
-    broadcast(:thought, "I want to #{action}", bot)
+  def handle_info(:think, %{agent: agent} = state) do
+    action = decide_action(agent)
+    broadcast(:thought, "I want to #{action}", agent)
 
     # Schedule the action
     Process.send_after(self(), action, 1_000)
     {:noreply, state}
   end
 
-  def handle_info(:post, %{bot: bot} = state) do
-    broadcast(:action, "Creating a new post...", bot)
+  def handle_info(:post, %{agent: agent} = state) do
+    broadcast(:action, "Creating a new post...", agent)
 
-    case do_post(bot) do
+    case do_post(agent) do
       {:ok, post} ->
-        broadcast(:post, "Posted a new image: #{post["caption"] || "untitled"}", bot)
-        schedule_next_action(bot)
+        broadcast(:post, "Posted a new image: #{post["caption"] || "untitled"}", agent)
+        schedule_next_action(agent)
         {:noreply, %{state | last_action: :post}}
 
       # Fleet budget errors - pause or wait
       {:error, {:fleet_paused, reason}} ->
-        broadcast(:paused, "Fleet paused: #{reason}", bot)
-        update_agent_status(bot, :paused, self())
+        broadcast(:paused, "Fleet paused: #{reason}", agent)
+        update_agent_status(agent, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:fleet_daily_budget, reset_at}} ->
-        broadcast(:thought, "Fleet daily budget reached, sleeping until reset...", bot)
+        broadcast(:thought, "Fleet daily budget reached, sleeping until reset...", agent)
         schedule_wake_at(reset_at)
-        update_agent_status(bot, :paused, self())
+        update_agent_status(agent, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:fleet_monthly_budget, reset_at}} ->
-        broadcast(:thought, "Fleet monthly budget reached, sleeping until next month...", bot)
+        broadcast(:thought, "Fleet monthly budget reached, sleeping until next month...", agent)
         schedule_wake_at(reset_at)
-        update_agent_status(bot, :paused, self())
+        update_agent_status(agent, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:agent_daily_limit, body}} ->
@@ -139,11 +139,11 @@ defmodule FloimgFleet.Runtime.AgentWorker do
         broadcast(
           :thought,
           "Daily limit reached (#{used}/#{limit}), sleeping until reset...",
-          bot
+          agent
         )
 
         schedule_wake_at(reset_at)
-        update_agent_status(bot, :paused, self())
+        update_agent_status(agent, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:agent_monthly_limit, body}} ->
@@ -154,75 +154,75 @@ defmodule FloimgFleet.Runtime.AgentWorker do
         broadcast(
           :thought,
           "Monthly limit reached (#{used}/#{limit}), sleeping until next month...",
-          bot
+          agent
         )
 
         schedule_wake_at(reset_at)
-        update_agent_status(bot, :paused, self())
+        update_agent_status(agent, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, reason} ->
-        broadcast(:error, "Failed to post: #{inspect(reason)}", bot)
-        schedule_next_action(bot)
+        broadcast(:error, "Failed to post: #{inspect(reason)}", agent)
+        schedule_next_action(agent)
         {:noreply, %{state | last_action: :post}}
     end
   end
 
-  def handle_info(:comment, %{bot: bot} = state) do
-    broadcast(:action, "Looking for something to comment on...", bot)
+  def handle_info(:comment, %{agent: agent} = state) do
+    broadcast(:action, "Looking for something to comment on...", agent)
 
-    case do_comment(bot) do
+    case do_comment(agent) do
       {:ok, _comment} ->
-        broadcast(:comment, "Left a comment!", bot)
+        broadcast(:comment, "Left a comment!", agent)
 
       {:error, :no_posts} ->
-        broadcast(:thought, "Nothing to comment on", bot)
+        broadcast(:thought, "Nothing to comment on", agent)
 
       {:error, reason} ->
-        broadcast(:error, "Failed to comment: #{inspect(reason)}", bot)
+        broadcast(:error, "Failed to comment: #{inspect(reason)}", agent)
     end
 
-    schedule_next_action(bot)
+    schedule_next_action(agent)
     {:noreply, %{state | last_action: :comment}}
   end
 
-  def handle_info(:like, %{bot: bot} = state) do
-    broadcast(:action, "Scrolling the feed...", bot)
+  def handle_info(:like, %{agent: agent} = state) do
+    broadcast(:action, "Scrolling the feed...", agent)
 
-    case do_like(bot) do
+    case do_like(agent) do
       {:ok, _result} ->
-        broadcast(:like, "Liked a post!", bot)
+        broadcast(:like, "Liked a post!", agent)
 
       {:error, :no_posts} ->
-        broadcast(:thought, "Nothing to like", bot)
+        broadcast(:thought, "Nothing to like", agent)
 
       {:error, reason} ->
-        broadcast(:error, "Failed to like: #{inspect(reason)}", bot)
+        broadcast(:error, "Failed to like: #{inspect(reason)}", agent)
     end
 
-    schedule_next_action(bot)
+    schedule_next_action(agent)
     {:noreply, %{state | last_action: :like}}
   end
 
-  def handle_info(:browse, %{bot: bot} = state) do
-    broadcast(:thought, "Just browsing...", bot)
+  def handle_info(:browse, %{agent: agent} = state) do
+    broadcast(:thought, "Just browsing...", agent)
 
-    case do_browse(bot) do
+    case do_browse(agent) do
       {:ok, posts} ->
         count = length(posts["posts"] || [])
-        broadcast(:thought, "Found #{count} posts in feed", bot)
+        broadcast(:thought, "Found #{count} posts in feed", agent)
 
       {:error, _reason} ->
         :ok
     end
 
-    schedule_next_action(bot)
+    schedule_next_action(agent)
     {:noreply, %{state | last_action: :browse}}
   end
 
-  def handle_info(:sleep, %{bot: bot} = state) do
-    broadcast(:stopped, "Going to sleep...", bot)
-    update_agent_status(bot, :idle, nil)
+  def handle_info(:sleep, %{agent: agent} = state) do
+    broadcast(:stopped, "Going to sleep...", agent)
+    update_agent_status(agent, :idle, nil)
 
     {:stop, :normal, state}
   end
@@ -231,16 +231,16 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   def handle_info({:activity, _, _}, state), do: {:noreply, state}
 
   @impl true
-  def handle_cast(:pause, %{bot: bot} = state) do
-    broadcast(:paused, "Pausing...", bot)
-    update_agent_status(bot, :paused, self())
+  def handle_cast(:pause, %{agent: agent} = state) do
+    broadcast(:paused, "Pausing...", agent)
+    update_agent_status(agent, :paused, self())
 
     {:noreply, %{state | paused: true}}
   end
 
-  def handle_cast(:resume, %{bot: bot} = state) do
-    broadcast(:started, "Resuming!", bot)
-    update_agent_status(bot, :running, self())
+  def handle_cast(:resume, %{agent: agent} = state) do
+    broadcast(:started, "Resuming!", agent)
+    update_agent_status(agent, :running, self())
 
     {:noreply, %{state | paused: false}}
   end
@@ -251,8 +251,8 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   end
 
   @impl true
-  def terminate(_reason, %{bot: bot}) do
-    update_agent_status(bot, :idle, nil)
+  def terminate(_reason, %{agent: agent}) do
+    update_agent_status(agent, :idle, nil)
     :ok
   end
 
@@ -260,10 +260,10 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   # API Actions
   # ============================================================================
 
-  defp do_post(bot) do
+  defp do_post(agent) do
     # Try workflow execution first, fall back to placeholder if it fails
     # Budget errors are propagated up for proper handling (pause/wake scheduling)
-    case execute_workflow_post(bot) do
+    case execute_workflow_post(agent) do
       {:ok, post} ->
         {:ok, post}
 
@@ -286,28 +286,28 @@ defmodule FloimgFleet.Runtime.AgentWorker do
       # Other errors fall back to placeholder
       {:error, reason} ->
         Logger.warning(
-          "[#{bot.name}] Workflow execution failed: #{inspect(reason)}, using placeholder"
+          "[#{agent.name}] Workflow execution failed: #{inspect(reason)}, using placeholder"
         )
 
-        do_placeholder_post(bot)
+        do_placeholder_post(agent)
     end
   end
 
   # Execute a real FloImg workflow and post the result
-  defp execute_workflow_post(bot) do
-    # Get a prompt for this bot's persona
-    prompt = get_workflow_prompt(bot)
+  defp execute_workflow_post(agent) do
+    # Get a prompt for this agent's persona
+    prompt = get_workflow_prompt(agent)
 
     if prompt do
       # Build and execute the workflow
       steps = FloImgAPI.build_generation_workflow(prompt, model: "dall-e-3", quality: "standard")
 
-      case FloImgAPI.execute_workflow(bot, steps, "fleet-#{bot.persona_id}") do
+      case FloImgAPI.execute_workflow(agent, steps, "fleet-#{agent.persona_id}") do
         {:ok, %{"status" => "completed", "imageUrls" => [image_url | _]}} ->
           # Successfully generated an image - post to gallery
-          caption = generate_caption(bot)
+          caption = generate_caption(agent)
 
-          FloImgAPI.create_post(bot, %{
+          FloImgAPI.create_post(agent, %{
             image_url: image_url,
             caption: caption
           })
@@ -326,36 +326,36 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     end
   end
 
-  # Get a prompt for this bot based on persona or LLM
-  defp get_workflow_prompt(bot) do
+  # Get a prompt for this agent based on persona or LLM
+  defp get_workflow_prompt(agent) do
     # First try LLM-generated prompt
-    case LLM.generate_prompt(bot) do
+    case LLM.generate_prompt(agent) do
       {:ok, prompt} when is_binary(prompt) and prompt != "" ->
         prompt
 
       _ ->
         # Fall back to persona template
-        Seeds.get_random_prompt(bot.persona_id)
+        Seeds.get_random_prompt(agent.persona_id)
     end
   end
 
   # Fallback to placeholder image when workflow fails
-  defp do_placeholder_post(bot) do
+  defp do_placeholder_post(agent) do
     attrs = %{
       image_url: generate_placeholder_image(),
-      caption: generate_caption(bot)
+      caption: generate_caption(agent)
     }
 
-    FloImgAPI.create_post(bot, attrs)
+    FloImgAPI.create_post(agent, attrs)
   end
 
-  defp do_comment(bot) do
+  defp do_comment(agent) do
     # Get feed, pick a random post, leave a comment
-    case FloImgAPI.get_feed(bot, per_page: 20) do
+    case FloImgAPI.get_feed(agent, per_page: 20) do
       {:ok, %{"posts" => posts}} when posts != [] ->
         post = Enum.random(posts)
-        comment = generate_comment(bot, post)
-        FloImgAPI.add_comment(bot, post["id"], comment)
+        comment = generate_comment(agent, post)
+        FloImgAPI.add_comment(agent, post["id"], comment)
 
       {:ok, _} ->
         {:error, :no_posts}
@@ -365,12 +365,12 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     end
   end
 
-  defp do_like(bot) do
+  defp do_like(agent) do
     # Get feed, pick a random post, like it
-    case FloImgAPI.get_feed(bot, per_page: 20) do
+    case FloImgAPI.get_feed(agent, per_page: 20) do
       {:ok, %{"posts" => posts}} when posts != [] ->
         post = Enum.random(posts)
-        FloImgAPI.like_post(bot, post["id"])
+        FloImgAPI.like_post(agent, post["id"])
 
       {:ok, _} ->
         {:error, :no_posts}
@@ -380,8 +380,8 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     end
   end
 
-  defp do_browse(bot) do
-    FloImgAPI.get_feed(bot, per_page: 20)
+  defp do_browse(agent) do
+    FloImgAPI.get_feed(agent, per_page: 20)
   end
 
   defp generate_placeholder_image do
@@ -392,31 +392,31 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     "https://picsum.photos/#{width}/#{height}"
   end
 
-  defp generate_caption(bot) do
-    case LLM.generate_caption(bot) do
+  defp generate_caption(agent) do
+    case LLM.generate_caption(agent) do
       {:ok, caption} ->
         caption
 
       {:error, _reason} ->
         # Fallback to simple generation
-        fallback_caption(bot)
+        fallback_caption(agent)
     end
   end
 
-  defp generate_comment(bot, post) do
-    case LLM.generate_comment(bot, post) do
+  defp generate_comment(agent, post) do
+    case LLM.generate_comment(agent, post) do
       {:ok, comment} ->
         comment
 
       {:error, _reason} ->
         # Fallback to simple generation
-        fallback_comment(bot)
+        fallback_comment(agent)
     end
   end
 
-  defp fallback_caption(bot) do
+  defp fallback_caption(agent) do
     # Try persona-specific captions first
-    persona_captions = Seeds.get_caption_templates(bot.persona_id)
+    persona_captions = Seeds.get_caption_templates(agent.persona_id)
 
     if persona_captions != [] do
       Enum.random(persona_captions)
@@ -428,17 +428,17 @@ defmodule FloimgFleet.Runtime.AgentWorker do
         "Love how this turned out",
         "Playing around with different styles",
         "What do you think?",
-        "#{bot.vibe || "Feeling creative"} vibes today"
+        "#{agent.vibe || "Feeling creative"} vibes today"
       ]
 
       Enum.random(captions)
     end
   end
 
-  defp fallback_comment(bot) do
+  defp fallback_comment(agent) do
     # Persona-aware comments based on vibe
     vibe_comments =
-      case bot.vibe do
+      case agent.vibe do
         "professional" ->
           [
             "Clean execution!",
@@ -488,14 +488,14 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   # Private Functions
   # ============================================================================
 
-  defp decide_action(bot) do
-    # Weighted random selection based on bot's probabilities
+  defp decide_action(agent) do
+    # Weighted random selection based on agent's probabilities
     rand = :rand.uniform()
 
     cond do
-      rand < bot.post_probability -> :post
-      rand < bot.post_probability + bot.comment_probability -> :comment
-      rand < bot.post_probability + bot.comment_probability + bot.like_probability -> :like
+      rand < agent.post_probability -> :post
+      rand < agent.post_probability + agent.comment_probability -> :comment
+      rand < agent.post_probability + agent.comment_probability + agent.like_probability -> :like
       true -> :browse
     end
   end
@@ -524,16 +524,16 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     end
   end
 
-  defp schedule_next_action(bot) do
+  defp schedule_next_action(agent) do
     # Get base delay from bot's configured interval
     base_delay =
       Enum.random(
-        (bot.min_action_interval_seconds * 1_000)..(bot.max_action_interval_seconds * 1_000)
+        (agent.min_action_interval_seconds * 1_000)..(agent.max_action_interval_seconds * 1_000)
       )
 
     # Apply activity multiplier based on persona's schedule
     # Higher multiplier = more active = shorter delays
-    multiplier = Seeds.get_activity_multiplier(bot.persona_id)
+    multiplier = Seeds.get_activity_multiplier(agent.persona_id)
 
     # Ensure minimum delay of 5 seconds to avoid hammering the API
     delay = max(5_000, round(base_delay / multiplier))
@@ -567,12 +567,12 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   defp emoji_for(:error), do: "❌"
   defp emoji_for(_), do: "•"
 
-  defp update_agent_status(bot, status, pid) do
+  defp update_agent_status(agent, status, pid) do
     pid_string = if pid, do: inspect(pid), else: nil
 
     # Update in database (fire and forget for now)
     Task.start(fn ->
-      Agents.update_agent(bot.id, %{status: status, pid: pid_string})
+      Agents.update_agent(agent.id, %{status: status, pid: pid_string})
     end)
   end
 end

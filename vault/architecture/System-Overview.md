@@ -1,10 +1,10 @@
 # FloImg Fleet - System Overview
 
-FloImg Fleet is a bot orchestration system for simulating user activity on FloImg Studio's gallery features.
+FloImg Fleet is an agent orchestration system for simulating user activity on FloImg Studio's gallery features.
 
 ## Purpose
 
-Solve the cold-start problem for FloImg Studio's social features by creating LLM-driven bots that:
+Solve the cold-start problem for FloImg Studio's social features by creating LLM-driven agents that:
 - Create and share images in the gallery
 - Upvote and interact with content
 - Leave comments
@@ -17,37 +17,37 @@ Solve the cold-start problem for FloImg Studio's social features by creating LLM
 Following the Flojo pattern, we separate read and write operations:
 
 ```
-lib/floimg_fleet/bots/
+lib/floimg_fleet/agents/
 ├── commands/          # Write operations
-│   ├── create_bot.ex
-│   ├── start_bot.ex
-│   ├── pause_bot.ex
+│   ├── create_agent.ex
+│   ├── start_agent.ex
+│   ├── pause_agent.ex
 │   └── ...
 ├── queries/           # Read operations
-│   ├── list_bots.ex
-│   ├── get_bot.ex
+│   ├── list_agents.ex
+│   ├── get_agent.ex
 │   └── get_activity.ex
 └── schemas/           # Ecto schemas
-    ├── bot.ex
-    └── bot_activity.ex
+    ├── agent.ex
+    └── agent_activity.ex
 ```
 
-**Context Gateway**: `FloimgFleet.Bots` module provides the public API, delegating to commands and queries.
+**Context Gateway**: `FloimgFleet.Agents` module provides the public API, delegating to commands and queries.
 
-### Bot Runtime (GenServer per Bot)
+### Agent Runtime (GenServer per Agent)
 
 Following the Shinstagram pattern:
 
 ```
 lib/floimg_fleet/runtime/
-├── bot_supervisor.ex   # DynamicSupervisor
-└── bot_agent.ex        # GenServer per bot
+├── agent_supervisor.ex   # DynamicSupervisor
+└── agent_worker.ex       # GenServer per agent
 ```
 
 **Lifecycle**:
-1. Bot configuration stored in Postgres
+1. Agent configuration stored in Postgres
 2. When started, a GenServer process is created
-3. Bot "thinks" periodically, decides actions based on probabilities
+3. Agent "thinks" periodically, decides actions based on probabilities
 4. Actions logged to database and broadcast via PubSub
 5. When stopped, GenServer terminates gracefully
 
@@ -57,9 +57,9 @@ lib/floimg_fleet/runtime/
 FloimgFleet.Application
 ├── FloimgFleet.Repo
 ├── Phoenix.PubSub
-├── FloimgFleet.Runtime.BotSupervisor
-│   ├── BotAgent (bot 1)
-│   ├── BotAgent (bot 2)
+├── FloimgFleet.Runtime.AgentSupervisor
+│   ├── AgentWorker (agent 1)
+│   ├── AgentWorker (agent 2)
 │   └── ...
 └── FloimgFleetWeb.Endpoint
 ```
@@ -68,15 +68,15 @@ FloimgFleet.Application
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Admin Panel   │────▶│   Bots Context   │────▶│    Postgres     │
-│   (LiveView)    │     │   (Commands/     │     │  (Bot configs)  │
+│   Admin Panel   │────▶│  Agents Context  │────▶│    Postgres     │
+│   (LiveView)    │     │   (Commands/     │     │ (Agent configs) │
 └─────────────────┘     │    Queries)      │     └─────────────────┘
         │               └──────────────────┘              │
         │                        │                        │
         ▼                        ▼                        │
 ┌─────────────────┐     ┌──────────────────┐              │
-│   PubSub        │◀────│  Bot Supervisor  │              │
-│   (Activity)    │     │  + Bot Agents    │◀─────────────┘
+│   PubSub        │◀────│ Agent Supervisor │              │
+│   (Activity)    │     │ + Agent Workers  │◀─────────────┘
 └─────────────────┘     └──────────────────┘
         │                        │
         ▼                        ▼
@@ -90,7 +90,7 @@ FloimgFleet.Application
 
 ### Persona System
 
-Bots are generated from 6 predefined user archetypes defined in `priv/seeds/personas.json`:
+Agents are generated from 6 predefined user archetypes defined in `priv/seeds/personas.json`:
 
 | Persona | Vibe | Typical Use Case |
 |---------|------|------------------|
@@ -112,22 +112,22 @@ See: [[Persona-System]]
 
 ### Activity Schedules
 
-Bots operate on timezone-aware schedules matching their persona:
+Agents operate on timezone-aware schedules matching their persona:
 
 - Product photographers: Business hours EST
 - Social marketers: Engagement hours (7-9am, 12-2pm, 6-9pm) all week
 - Indie game devs: Evenings/weekends CST
 - AI artists: Late night (creative hours) UTC
 
-During peak hours, action intervals are multiplied (faster). Off-peak, bots slow down or go dormant.
+During peak hours, action intervals are multiplied (faster). Off-peak, agents slow down or go dormant.
 
 See: [[Activity-Schedules]]
 
 ### Real Workflow Execution
 
-Bots generate actual images via FloImg workflows:
+Agents generate actual images via FloImg workflows:
 1. LLM generates a DALL-E prompt based on persona
-2. Bot executes a generation workflow via FSC API
+2. Agent executes a generation workflow via FSC API
 3. Result image is posted to the gallery with LLM-generated caption
 
 Falls back to placeholder images if workflow execution fails.
@@ -136,16 +136,16 @@ See: [[FSC-Integration]]
 
 ## Key Decisions
 
-### Bot State Split
-- **Persistent state** (Postgres): Bot configuration, personality, behavior settings
+### Agent State Split
+- **Persistent state** (Postgres): Agent configuration, personality, behavior settings
 - **Runtime state** (GenServer): Current action, last thought, paused flag
 
 ### Activity Logging
-- All bot actions logged to `bot_activities` table for analytics
+- All agent actions logged to `agent_activities` table for analytics
 - Real-time updates via Phoenix PubSub for live dashboard
 
 ### Probabilistic Behavior
-- Each bot has configurable probabilities for post/comment/like/browse
+- Each agent has configurable probabilities for post/comment/like/browse
 - Action intervals randomized within configured min/max bounds
 - Schedule multiplier adjusts intervals based on time of day
 - Creates human-like unpredictable behavior
@@ -166,7 +166,7 @@ See: [[FSC-Integration]]
 
 ## Related Documents
 
-- [[Persona-System]] - Persona definitions and bot generation
+- [[Persona-System]] - Persona definitions and agent generation
 - [[Activity-Schedules]] - Timezone-aware activity patterns
 - [[FSC-Integration]] - FloImg Studio Cloud API integration
 - [[LLM-Content-Generation]] - LLM prompts and content strategies

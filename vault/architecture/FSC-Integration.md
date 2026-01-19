@@ -16,7 +16,7 @@ Service tokens:
 - Bypass usage quotas
 - Are created via FSC admin interface
 
-Each API request includes the `X-Bot-Id` header to identify the acting bot.
+Each API request includes the `X-Agent-Id` header to identify the acting bot.
 
 ## Bot User Provisioning
 

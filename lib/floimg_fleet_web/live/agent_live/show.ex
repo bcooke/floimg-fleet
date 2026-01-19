@@ -50,9 +50,9 @@ defmodule FloimgFleetWeb.AgentLive.Show do
     end
   end
 
-  def handle_info({:bot_updated, bot}, socket) do
-    if bot.id == socket.assigns.bot.id do
-      {:noreply, assign(socket, :bot, bot)}
+  def handle_info({:agent_updated, agent}, socket) do
+    if agent.id == socket.assigns.bot.id do
+      {:noreply, assign(socket, :bot, agent)}
     else
       {:noreply, socket}
     end
@@ -67,10 +67,10 @@ defmodule FloimgFleetWeb.AgentLive.Show do
         {:noreply,
          socket
          |> assign(:bot, bot)
-         |> put_flash(:info, "Bot started")}
+         |> put_flash(:info, "Agent started")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to start: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to start agent: #{reason}")}
     end
   end
 
@@ -80,10 +80,10 @@ defmodule FloimgFleetWeb.AgentLive.Show do
         {:noreply,
          socket
          |> assign(:bot, bot)
-         |> put_flash(:info, "Bot paused")}
+         |> put_flash(:info, "Agent paused")}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to pause: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to pause agent: #{reason}")}
     end
   end
 
@@ -229,7 +229,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
 
     <.modal
       :if={@live_action == :edit}
-      id="bot-modal"
+      id="agent-modal"
       show
       on_cancel={JS.navigate(~p"/bots/#{@bot.id}")}
     >
