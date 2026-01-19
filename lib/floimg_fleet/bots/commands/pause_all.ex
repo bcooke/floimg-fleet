@@ -10,12 +10,14 @@ defmodule FloimgFleet.Bots.Commands.PauseAll do
 
   @type t :: %__MODULE__{}
 
-  @spec execute(t()) :: :ok
+  @spec execute(t()) :: {:ok, non_neg_integer()}
   def execute(%__MODULE__{}) do
-    for pid <- BotSupervisor.list_children() do
+    pids = BotSupervisor.list_children()
+
+    for pid <- pids do
       BotAgent.pause(pid)
     end
 
-    :ok
+    {:ok, length(pids)}
   end
 end
