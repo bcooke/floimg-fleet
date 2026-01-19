@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Commands.StartAgent do
   @moduledoc """
-  Command to start a bot agent.
+  Command to start an agent.
   """
 
   alias FloimgFleet.Agents.Queries.GetAgent
@@ -13,8 +13,8 @@ defmodule FloimgFleet.Agents.Commands.StartAgent do
   @spec execute(t()) :: {:ok, pid()} | {:error, term()}
   def execute(%__MODULE__{agent_id: agent_id}) do
     case GetAgent.execute(agent_id) do
-      {:ok, bot} ->
-        AgentSupervisor.start_agent(bot)
+      {:ok, agent} ->
+        AgentSupervisor.start_agent(agent)
 
       {:error, _} = error ->
         error

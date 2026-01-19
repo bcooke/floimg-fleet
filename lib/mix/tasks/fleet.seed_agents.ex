@@ -1,18 +1,18 @@
 defmodule Mix.Tasks.Fleet.SeedAgents do
-  @shortdoc "Seeds bots from personas.json"
+  @shortdoc "Seeds agents from personas.json"
 
   @moduledoc """
-  Seeds bots into the database using persona definitions.
+  Seeds agents into the database using persona definitions.
 
   ## Usage
 
-      # Seed 6 bots with weighted persona distribution (default)
+      # Seed 6 agents with weighted persona distribution (default)
       mix fleet.seed_agents
 
-      # Seed a specific number of bots
+      # Seed a specific number of agents
       mix fleet.seed_agents --count 10
 
-      # Seed bots of a specific persona only
+      # Seed agents of a specific persona only
       mix fleet.seed_agents --persona product_photographer --count 3
 
       # List available personas
@@ -20,13 +20,13 @@ defmodule Mix.Tasks.Fleet.SeedAgents do
 
   ## Options
 
-    * `--count`, `-n` - Number of bots to create (default: 6)
+    * `--count`, `-n` - Number of agents to create (default: 6)
     * `--persona`, `-p` - Create only from specific persona
     * `--list`, `-l` - List available persona IDs
 
   ## Examples
 
-      # Create one bot per persona
+      # Create one agent per persona
       mix fleet.seed_agents --count 6
 
       # Create a swarm of social marketers
@@ -85,7 +85,7 @@ defmodule Mix.Tasks.Fleet.SeedAgents do
     count = Keyword.get(opts, :count, 6)
     persona_filter = Keyword.get(opts, :persona)
 
-    Mix.shell().info("\nSeeding #{count} bots...")
+    Mix.shell().info("\nSeeding #{count} agents...")
 
     if persona_filter do
       Mix.shell().info("Using persona: #{persona_filter}")
@@ -95,18 +95,21 @@ defmodule Mix.Tasks.Fleet.SeedAgents do
 
     Mix.shell().info("")
 
-    bots = Seeds.generate_bot_batch(count: count, persona: persona_filter)
+    agents = Seeds.generate_agent_batch(count: count, persona: persona_filter)
 
     results =
-      Enum.map(bots, fn bot_attrs ->
-        case Agents.create_agent(bot_attrs) do
-          {:ok, bot} ->
-            Mix.shell().info("  ✓ Created: #{bot.name} (@#{bot.username}) [#{bot.persona_id}]")
-            {:ok, bot}
+      Enum.map(agents, fn agent_attrs ->
+        case Agents.create_agent(agent_attrs) do
+          {:ok, agent} ->
+            Mix.shell().info(
+              "  ✓ Created: #{agent.name} (@#{agent.username}) [#{agent.persona_id}]"
+            )
+
+            {:ok, agent}
 
           {:error, changeset} ->
             errors = format_errors(changeset)
-            Mix.shell().error("  ✗ Failed to create #{bot_attrs.name}: #{errors}")
+            Mix.shell().error("  ✗ Failed to create #{agent_attrs.name}: #{errors}")
             {:error, changeset}
         end
       end)
@@ -115,7 +118,7 @@ defmodule Mix.Tasks.Fleet.SeedAgents do
     failed = Enum.count(results, fn {status, _} -> status == :error end)
 
     Mix.shell().info("")
-    Mix.shell().info("Done! Created #{successful} bots, #{failed} failed.")
+    Mix.shell().info("Done! Created #{successful} agents, #{failed} failed.")
   end
 
   defp format_errors(changeset) do

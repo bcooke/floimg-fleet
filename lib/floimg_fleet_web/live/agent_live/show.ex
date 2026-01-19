@@ -10,13 +10,13 @@ defmodule FloimgFleetWeb.AgentLive.Show do
     end
 
     case Agents.get_agent(id) do
-      {:ok, bot} ->
+      {:ok, agent} ->
         activities = Agents.get_activity(%{agent_id: id, limit: 50})
 
         {:ok,
          socket
-         |> assign(:page_title, bot.name)
-         |> assign(:bot, bot)
+         |> assign(:page_title, agent.name)
+         |> assign(:agent, agent)
          |> stream(:activities, activities, at: 0)}
 
       {:error, :not_found} ->
@@ -38,12 +38,12 @@ defmodule FloimgFleetWeb.AgentLive.Show do
 
   defp apply_action(socket, :edit, _id) do
     socket
-    |> assign(:page_title, "Edit #{socket.assigns.bot.name}")
+    |> assign(:page_title, "Edit #{socket.assigns.agent.name}")
   end
 
   @impl true
   def handle_info({:agent_activity, activity}, socket) do
-    if activity.agent_id == socket.assigns.bot.id do
+    if activity.agent_id == socket.assigns.agent.id do
       {:noreply, stream_insert(socket, :activities, activity, at: 0)}
     else
       {:noreply, socket}
@@ -51,8 +51,8 @@ defmodule FloimgFleetWeb.AgentLive.Show do
   end
 
   def handle_info({:agent_updated, agent}, socket) do
-    if agent.id == socket.assigns.bot.id do
-      {:noreply, assign(socket, :bot, agent)}
+    if agent.id == socket.assigns.agent.id do
+      {:noreply, assign(socket, :agent, agent)}
     else
       {:noreply, socket}
     end
@@ -62,11 +62,11 @@ defmodule FloimgFleetWeb.AgentLive.Show do
 
   @impl true
   def handle_event("start", _params, socket) do
-    case Agents.start_agent(socket.assigns.bot.id) do
-      {:ok, bot} ->
+    case Agents.start_agent(socket.assigns.agent.id) do
+      {:ok, agent} ->
         {:noreply,
          socket
-         |> assign(:bot, bot)
+         |> assign(:agent, agent)
          |> put_flash(:info, "Agent started")}
 
       {:error, reason} ->
@@ -75,11 +75,11 @@ defmodule FloimgFleetWeb.AgentLive.Show do
   end
 
   def handle_event("pause", _params, socket) do
-    case Agents.pause_agent(socket.assigns.bot.id) do
-      {:ok, bot} ->
+    case Agents.pause_agent(socket.assigns.agent.id) do
+      {:ok, agent} ->
         {:noreply,
          socket
-         |> assign(:bot, bot)
+         |> assign(:agent, agent)
          |> put_flash(:info, "Agent paused")}
 
       {:error, reason} ->
@@ -102,7 +102,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Bots
+          Back to Agents
         </.link>
       </div>
 
@@ -112,17 +112,17 @@ defmodule FloimgFleetWeb.AgentLive.Show do
             <div class="card-body">
               <div class="flex justify-between items-start">
                 <div>
-                  <h1 class="card-title text-2xl">{@bot.name}</h1>
-                  <p class="text-base-content/60">@{@bot.username}</p>
+                  <h1 class="card-title text-2xl">{@agent.name}</h1>
+                  <p class="text-base-content/60">@{@agent.username}</p>
                 </div>
                 <div class="flex gap-2">
-                  <%= if @bot.status in [:idle, :paused] do %>
+                  <%= if @agent.status in [:idle, :paused] do %>
                     <button phx-click="start" class="btn btn-success btn-sm">Start</button>
                   <% end %>
-                  <%= if @bot.status == :running do %>
+                  <%= if @agent.status == :running do %>
                     <button phx-click="pause" class="btn btn-warning btn-sm">Pause</button>
                   <% end %>
-                  <.link navigate={~p"/bots/#{@bot.id}/edit"} class="btn btn-ghost btn-sm">
+                  <.link navigate={~p"/bots/#{@agent.id}/edit"} class="btn btn-ghost btn-sm">
                     Edit
                   </.link>
                 </div>
@@ -133,14 +133,14 @@ defmodule FloimgFleetWeb.AgentLive.Show do
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <h3 class="font-semibold mb-2">Status</h3>
-                  <span class={["badge", status_badge_class(@bot.status)]}>
-                    {@bot.status}
+                  <span class={["badge", status_badge_class(@agent.status)]}>
+                    {@agent.status}
                   </span>
                 </div>
                 <div>
                   <h3 class="font-semibold mb-2">Last Action</h3>
                   <span class="text-base-content/60">
-                    {format_time(@bot.last_action_at)}
+                    {format_time(@agent.last_action_at)}
                   </span>
                 </div>
               </div>
@@ -149,21 +149,21 @@ defmodule FloimgFleetWeb.AgentLive.Show do
 
               <div>
                 <h3 class="font-semibold mb-2">Personality</h3>
-                <p class="text-base-content/80">{@bot.personality || "Not set"}</p>
+                <p class="text-base-content/80">{@agent.personality || "Not set"}</p>
               </div>
 
               <div class="mt-4">
                 <h3 class="font-semibold mb-2">Vibe</h3>
-                <p class="text-base-content/80">{@bot.vibe || "Not set"}</p>
+                <p class="text-base-content/80">{@agent.vibe || "Not set"}</p>
               </div>
 
               <div class="mt-4">
                 <h3 class="font-semibold mb-2">Interests</h3>
                 <div class="flex flex-wrap gap-2">
-                  <%= for interest <- @bot.interests || [] do %>
+                  <%= for interest <- @agent.interests || [] do %>
                     <span class="badge badge-outline">{interest}</span>
                   <% end %>
-                  <%= if Enum.empty?(@bot.interests || []) do %>
+                  <%= if Enum.empty?(@agent.interests || []) do %>
                     <span class="text-base-content/60">None set</span>
                   <% end %>
                 </div>
@@ -175,20 +175,20 @@ defmodule FloimgFleetWeb.AgentLive.Show do
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="stat bg-base-300 rounded-lg p-4">
                   <div class="stat-title text-xs">Post Chance</div>
-                  <div class="stat-value text-lg">{percent(@bot.post_probability)}</div>
+                  <div class="stat-value text-lg">{percent(@agent.post_probability)}</div>
                 </div>
                 <div class="stat bg-base-300 rounded-lg p-4">
                   <div class="stat-title text-xs">Comment Chance</div>
-                  <div class="stat-value text-lg">{percent(@bot.comment_probability)}</div>
+                  <div class="stat-value text-lg">{percent(@agent.comment_probability)}</div>
                 </div>
                 <div class="stat bg-base-300 rounded-lg p-4">
                   <div class="stat-title text-xs">Like Chance</div>
-                  <div class="stat-value text-lg">{percent(@bot.like_probability)}</div>
+                  <div class="stat-value text-lg">{percent(@agent.like_probability)}</div>
                 </div>
                 <div class="stat bg-base-300 rounded-lg p-4">
                   <div class="stat-title text-xs">Action Interval</div>
                   <div class="stat-value text-lg">
-                    {@bot.min_action_interval_seconds}-{@bot.max_action_interval_seconds}s
+                    {@agent.min_action_interval_seconds}-{@agent.max_action_interval_seconds}s
                   </div>
                 </div>
               </div>
@@ -231,15 +231,15 @@ defmodule FloimgFleetWeb.AgentLive.Show do
       :if={@live_action == :edit}
       id="agent-modal"
       show
-      on_cancel={JS.navigate(~p"/bots/#{@bot.id}")}
+      on_cancel={JS.navigate(~p"/bots/#{@agent.id}")}
     >
       <.live_component
         module={FloimgFleetWeb.AgentLive.FormComponent}
-        id={@bot.id}
+        id={@agent.id}
         title={@page_title}
         action={@live_action}
-        bot={@bot}
-        navigate={~p"/bots/#{@bot.id}"}
+        agent={@agent}
+        navigate={~p"/bots/#{@agent.id}"}
       />
     </.modal>
     """

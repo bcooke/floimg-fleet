@@ -1,6 +1,6 @@
 defmodule FloimgFleet.LLM.Client do
   @moduledoc """
-  LLM client for generating bot content.
+  LLM client for generating agent content.
 
   Supports both Ollama (local development) and OpenAI (production).
   Uses the configured provider based on environment variables.
@@ -24,38 +24,38 @@ defmodule FloimgFleet.LLM.Client do
   @openai_default_model "gpt-4o-mini"
 
   @doc """
-  Generate a caption for a bot post based on the bot's personality.
+  Generate a caption for an agent post based on the agent's personality.
   """
-  def generate_caption(bot) do
-    prompt = build_caption_prompt(bot)
+  def generate_caption(agent) do
+    prompt = build_caption_prompt(agent)
     generate(prompt)
   end
 
   @doc """
-  Generate a DALL-E prompt for image generation based on the bot's persona.
+  Generate a DALL-E prompt for image generation based on the agent's persona.
 
   Returns {:ok, prompt} or {:error, reason}.
   """
-  def generate_prompt(bot) do
-    prompt = build_image_prompt(bot)
+  def generate_prompt(agent) do
+    prompt = build_image_prompt(agent)
     generate(prompt)
   end
 
   @doc """
-  Generate a comment for a post based on the bot's personality and the post content.
+  Generate a comment for a post based on the agent's personality and the post content.
   """
-  def generate_comment(bot, post) do
-    prompt = build_comment_prompt(bot, post)
+  def generate_comment(agent, post) do
+    prompt = build_comment_prompt(agent, post)
     generate(prompt)
   end
 
   @doc """
-  Decide what action a bot should take next based on its personality and current context.
+  Decide what action an agent should take next based on its personality and current context.
 
   Returns one of: :post, :comment, :like, :browse
   """
-  def decide_action(bot, context \\ %{}) do
-    prompt = build_decision_prompt(bot, context)
+  def decide_action(agent, context \\ %{}) do
+    prompt = build_decision_prompt(agent, context)
 
     case generate(prompt) do
       {:ok, response} ->
@@ -64,7 +64,7 @@ defmodule FloimgFleet.LLM.Client do
 
       {:error, reason} ->
         Logger.warning("LLM decision failed: #{inspect(reason)}, falling back to random")
-        {:ok, fallback_action(bot)}
+        {:ok, fallback_action(agent)}
     end
   end
 
@@ -160,15 +160,15 @@ defmodule FloimgFleet.LLM.Client do
   # Prompt Building
   # ============================================================================
 
-  defp build_image_prompt(bot) do
-    name = sanitize(bot.name) || "User"
-    personality = sanitize(bot.personality) || "a creative person"
-    vibe = sanitize(bot.vibe) || "casual"
-    interests = format_interests(bot.interests)
-    workflows = format_workflows(bot.persona_id)
+  defp build_image_prompt(agent) do
+    name = sanitize(agent.name) || "User"
+    personality = sanitize(agent.personality) || "a creative person"
+    vibe = sanitize(agent.vibe) || "casual"
+    interests = format_interests(agent.interests)
+    workflows = format_workflows(agent.persona_id)
 
     # Get example prompts from persona to guide the style
-    example_prompts = Seeds.get_prompt_templates(bot.persona_id)
+    example_prompts = Seeds.get_prompt_templates(agent.persona_id)
 
     examples_text =
       if Enum.empty?(example_prompts) do
@@ -193,12 +193,12 @@ defmodule FloimgFleet.LLM.Client do
     """
   end
 
-  defp build_caption_prompt(bot) do
-    name = sanitize(bot.name) || "User"
-    personality = sanitize(bot.personality) || "a friendly social media user"
-    vibe = sanitize(bot.vibe) || "casual"
-    interests = format_interests(bot.interests)
-    workflows = format_workflows(bot.persona_id)
+  defp build_caption_prompt(agent) do
+    name = sanitize(agent.name) || "User"
+    personality = sanitize(agent.personality) || "a friendly social media user"
+    vibe = sanitize(agent.vibe) || "casual"
+    interests = format_interests(agent.interests)
+    workflows = format_workflows(agent.persona_id)
 
     """
     You are #{name}, #{personality}.
@@ -215,11 +215,11 @@ defmodule FloimgFleet.LLM.Client do
     """
   end
 
-  defp build_comment_prompt(bot, post) do
-    name = sanitize(bot.name) || "User"
-    personality = sanitize(bot.personality) || "a friendly social media user"
-    vibe = sanitize(bot.vibe) || "casual"
-    interests = format_interests(bot.interests)
+  defp build_comment_prompt(agent, post) do
+    name = sanitize(agent.name) || "User"
+    personality = sanitize(agent.personality) || "a friendly social media user"
+    vibe = sanitize(agent.vibe) || "casual"
+    interests = format_interests(agent.interests)
     post_caption = sanitize(post["caption"]) || "an image"
 
     post_author =
@@ -253,11 +253,11 @@ defmodule FloimgFleet.LLM.Client do
     """
   end
 
-  defp build_decision_prompt(bot, context) do
-    name = sanitize(bot.name) || "User"
-    personality = sanitize(bot.personality) || "a friendly social media user"
-    vibe = sanitize(bot.vibe) || "casual"
-    interests = format_interests(bot.interests)
+  defp build_decision_prompt(agent, context) do
+    name = sanitize(agent.name) || "User"
+    personality = sanitize(agent.personality) || "a friendly social media user"
+    vibe = sanitize(agent.vibe) || "casual"
+    interests = format_interests(agent.interests)
     feed_count = Map.get(context, :feed_count, "some")
     recent_action = sanitize(Map.get(context, :recent_action, "browsing"))
 
@@ -374,14 +374,14 @@ defmodule FloimgFleet.LLM.Client do
     end
   end
 
-  defp fallback_action(bot) do
-    # Weighted random fallback based on bot's configured probabilities
+  defp fallback_action(agent) do
+    # Weighted random fallback based on agent's configured probabilities
     rand = :rand.uniform()
 
     cond do
-      rand < bot.post_probability -> :post
-      rand < bot.post_probability + bot.comment_probability -> :comment
-      rand < bot.post_probability + bot.comment_probability + bot.like_probability -> :like
+      rand < agent.post_probability -> :post
+      rand < agent.post_probability + agent.comment_probability -> :comment
+      rand < agent.post_probability + agent.comment_probability + agent.like_probability -> :like
       true -> :browse
     end
   end

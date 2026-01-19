@@ -1,13 +1,13 @@
 defmodule FloimgFleet.Agents.Commands.CreateAgent do
   @moduledoc """
-  Command to create a new bot.
+  Command to create a new agent.
 
   ## Examples
 
-      iex> execute(%CreateBot{name: "PhotoBot", username: "photobot"})
+      iex> execute(%CreateAgent{name: "PhotoAgent", username: "photoagent"})
       {:ok, %Agent{}}
 
-      iex> execute(%CreateBot{name: "", username: "photobot"})
+      iex> execute(%CreateAgent{name: "", username: "photoagent"})
       {:error, %Ecto.Changeset{}}
 
   """

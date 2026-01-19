@@ -12,7 +12,7 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
 
   ## Parameters
 
-  - `bot` - The bot executing the workflow (for auth headers)
+  - `agent` - The agent executing the workflow (for auth headers)
   - `steps` - List of pipeline steps in FloImg format
   - `name` - Optional name for the workflow (for logging)
 
@@ -41,15 +41,15 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
         }
       ]
 
-      execute_workflow(bot, steps, "fleet-gallery-generation")
+      execute_workflow(agent, steps, "fleet-gallery-generation")
   """
-  def execute_workflow(bot, steps, name \\ nil) do
+  def execute_workflow(agent, steps, name \\ nil) do
     body = %{
       steps: steps,
-      name: name || "fleet-bot-workflow"
+      name: name || "fleet-agent-workflow"
     }
 
-    Client.post(bot, "/api/execute/sync", body)
+    Client.post(agent, "/api/execute/sync", body)
   end
 
   @doc """

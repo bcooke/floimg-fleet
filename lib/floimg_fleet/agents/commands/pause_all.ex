@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Commands.PauseAll do
   @moduledoc """
-  Command to pause all running bots.
+  Command to pause all running agents.
   """
 
   alias FloimgFleet.Runtime.AgentSupervisor

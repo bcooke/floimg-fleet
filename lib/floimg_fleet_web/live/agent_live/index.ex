@@ -11,8 +11,8 @@ defmodule FloimgFleetWeb.AgentLive.Index do
       Phoenix.PubSub.subscribe(FloimgFleet.PubSub, "fleet:activity")
     end
 
-    bots = Agents.list_agents()
-    persona_stats = count_by_persona(bots)
+    agents = Agents.list_agents()
+    persona_stats = count_by_persona(agents)
 
     {:ok,
      socket
@@ -21,7 +21,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
      |> assign(:persona_filter, nil)
      |> assign(:persona_stats, persona_stats)
      |> assign(:persona_ids, Seeds.list_persona_ids())
-     |> stream(:agents, bots)
+     |> stream(:agents, agents)
      |> stream(:activities, [], at: 0)}
   end
 
@@ -33,21 +33,21 @@ defmodule FloimgFleetWeb.AgentLive.Index do
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Agents")
-    |> assign(:bot, nil)
+    |> assign(:agent, nil)
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Agent")
-    |> assign(:bot, %Agent{})
+    |> assign(:agent, %Agent{})
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     case Agents.get_agent(id) do
-      {:ok, bot} ->
+      {:ok, agent} ->
         socket
-        |> assign(:page_title, "Edit #{bot.name}")
-        |> assign(:bot, bot)
+        |> assign(:page_title, "Edit #{agent.name}")
+        |> assign(:agent, agent)
 
       {:error, :not_found} ->
         socket
@@ -90,10 +90,10 @@ defmodule FloimgFleetWeb.AgentLive.Index do
   @impl true
   def handle_event("start", %{"id" => id}, socket) do
     case Agents.start_agent(id) do
-      {:ok, bot} ->
+      {:ok, agent} ->
         {:noreply,
          socket
-         |> stream_insert(:agents, bot)
+         |> stream_insert(:agents, agent)
          |> put_flash(:info, "Agent started")}
 
       {:error, reason} ->
@@ -104,11 +104,11 @@ defmodule FloimgFleetWeb.AgentLive.Index do
   def handle_event("pause", %{"id" => id}, socket) do
     case Agents.pause_agent(id) do
       :ok ->
-        {:ok, bot} = Agents.get_agent(id)
+        {:ok, agent} = Agents.get_agent(id)
 
         {:noreply,
          socket
-         |> stream_insert(:agents, bot)
+         |> stream_insert(:agents, agent)
          |> put_flash(:info, "Agent paused")}
 
       {:error, reason} ->
@@ -118,10 +118,10 @@ defmodule FloimgFleetWeb.AgentLive.Index do
 
   def handle_event("delete", %{"id" => id}, socket) do
     case Agents.delete_agent(id) do
-      {:ok, bot} ->
+      {:ok, agent} ->
         {:noreply,
          socket
-         |> stream_delete(:agents, bot)
+         |> stream_delete(:agents, agent)
          |> put_flash(:info, "Agent deleted")}
 
       {:error, reason} ->
@@ -135,7 +135,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         {:noreply,
          socket
          |> stream(:agents, Agents.list_agents(), reset: true)
-         |> put_flash(:info, "Paused #{count} bots")}
+         |> put_flash(:info, "Paused #{count} agents")}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Failed to pause all: #{reason}")}
@@ -148,7 +148,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         {:noreply,
          socket
          |> stream(:agents, Agents.list_agents(), reset: true)
-         |> put_flash(:info, "Started #{count} bots")}
+         |> put_flash(:info, "Started #{count} agents")}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Failed to start all: #{reason}")}
@@ -156,24 +156,24 @@ defmodule FloimgFleetWeb.AgentLive.Index do
   end
 
   def handle_event("filter_persona", %{"persona" => ""}, socket) do
-    bots = Agents.list_agents()
+    agents = Agents.list_agents()
 
     {:noreply,
      socket
      |> assign(:persona_filter, nil)
-     |> assign(:persona_stats, count_by_persona(bots))
-     |> stream(:agents, bots, reset: true)}
+     |> assign(:persona_stats, count_by_persona(agents))
+     |> stream(:agents, agents, reset: true)}
   end
 
   def handle_event("filter_persona", %{"persona" => persona_id}, socket) do
-    all_bots = Agents.list_agents()
-    filtered_bots = Enum.filter(all_bots, fn bot -> bot.persona_id == persona_id end)
+    all_agents = Agents.list_agents()
+    filtered_agents = Enum.filter(all_agents, fn agent -> agent.persona_id == persona_id end)
 
     {:noreply,
      socket
      |> assign(:persona_filter, persona_id)
-     |> assign(:persona_stats, count_by_persona(all_bots))
-     |> stream(:agents, filtered_bots, reset: true)}
+     |> assign(:persona_stats, count_by_persona(all_agents))
+     |> stream(:agents, filtered_agents, reset: true)}
   end
 
   @impl true
@@ -234,50 +234,50 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                     </tr>
                   </thead>
                   <tbody id="agents" phx-update="stream">
-                    <tr :for={{dom_id, bot} <- @streams.agents} id={dom_id}>
+                    <tr :for={{dom_id, agent} <- @streams.agents} id={dom_id}>
                       <td>
-                        <.link navigate={~p"/bots/#{bot.id}"} class="link link-hover">
-                          {bot.name}
+                        <.link navigate={~p"/bots/#{agent.id}"} class="link link-hover">
+                          {agent.name}
                         </.link>
                       </td>
-                      <td>{bot.username}</td>
+                      <td>{agent.username}</td>
                       <td>
                         <span class="badge badge-ghost badge-sm">
-                          {format_persona(bot.persona_id)}
+                          {format_persona(agent.persona_id)}
                         </span>
                       </td>
                       <td>
-                        <.status_badge status={bot.status} />
+                        <.status_badge status={agent.status} />
                       </td>
                       <td class="text-sm text-base-content/60">
-                        {format_time(bot.last_action_at)}
+                        {format_time(agent.last_action_at)}
                       </td>
                       <td>
                         <div class="flex gap-1">
-                          <%= if bot.status in [:idle, :paused] do %>
+                          <%= if agent.status in [:idle, :paused] do %>
                             <button
                               phx-click="start"
-                              phx-value-id={bot.id}
+                              phx-value-id={agent.id}
                               class="btn btn-success btn-xs"
                             >
                               Start
                             </button>
                           <% end %>
-                          <%= if bot.status == :running do %>
+                          <%= if agent.status == :running do %>
                             <button
                               phx-click="pause"
-                              phx-value-id={bot.id}
+                              phx-value-id={agent.id}
                               class="btn btn-warning btn-xs"
                             >
                               Pause
                             </button>
                           <% end %>
-                          <.link navigate={~p"/bots/#{bot.id}/edit"} class="btn btn-ghost btn-xs">
+                          <.link navigate={~p"/bots/#{agent.id}/edit"} class="btn btn-ghost btn-xs">
                             Edit
                           </.link>
                           <button
                             phx-click="delete"
-                            phx-value-id={bot.id}
+                            phx-value-id={agent.id}
                             data-confirm="Are you sure you want to delete this agent?"
                             class="btn btn-error btn-xs"
                           >
@@ -320,13 +320,18 @@ defmodule FloimgFleetWeb.AgentLive.Index do
       </div>
     </div>
 
-    <.modal :if={@live_action in [:new, :edit]} id="agent-modal" show on_cancel={JS.navigate(~p"/bots")}>
+    <.modal
+      :if={@live_action in [:new, :edit]}
+      id="agent-modal"
+      show
+      on_cancel={JS.navigate(~p"/bots")}
+    >
       <.live_component
         module={FloimgFleetWeb.AgentLive.FormComponent}
-        id={@bot.id || :new}
+        id={@agent.id || :new}
         title={@page_title}
         action={@live_action}
-        bot={@bot}
+        agent={@agent}
         navigate={~p"/bots"}
       />
     </.modal>
@@ -356,9 +361,9 @@ defmodule FloimgFleetWeb.AgentLive.Index do
     Calendar.strftime(datetime, "%H:%M:%S")
   end
 
-  defp count_by_persona(bots) do
-    Enum.reduce(bots, %{}, fn bot, acc ->
-      persona = bot.persona_id || "custom"
+  defp count_by_persona(agents) do
+    Enum.reduce(agents, %{}, fn agent, acc ->
+      persona = agent.persona_id || "custom"
       Map.update(acc, persona, 1, &(&1 + 1))
     end)
   end

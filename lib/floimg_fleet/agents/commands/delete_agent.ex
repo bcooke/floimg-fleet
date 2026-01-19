@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Commands.DeleteAgent do
   @moduledoc """
-  Command to soft-delete a bot.
+  Command to soft-delete an agent.
   """
 
   alias FloimgFleet.Repo
@@ -15,14 +15,14 @@ defmodule FloimgFleet.Agents.Commands.DeleteAgent do
   @spec execute(t()) :: {:ok, Agent.t()} | {:error, term()}
   def execute(%__MODULE__{agent_id: agent_id}) do
     case GetAgent.execute(agent_id) do
-      {:ok, bot} ->
-        # Stop the bot if running
-        if bot.pid do
-          AgentSupervisor.stop_agent(bot.pid)
+      {:ok, agent} ->
+        # Stop the agent if running
+        if agent.pid do
+          AgentSupervisor.stop_agent(agent.pid)
         end
 
         # Soft delete
-        bot
+        agent
         |> Agent.changeset(%{deleted_at: DateTime.utc_now(), status: :idle, pid: nil})
         |> Repo.update()
 

@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Seeds do
   @moduledoc """
-  Seeding utilities for generating bots from persona definitions.
+  Seeding utilities for generating agents from persona definitions.
 
   Personas are defined in `priv/seeds/personas.json` and represent
   different FloImg user archetypes (product photographer, social marketer, etc.).
@@ -121,7 +121,7 @@ defmodule FloimgFleet.Seeds do
   @doc """
   Calculates the activity multiplier for a persona at the current time.
 
-  The multiplier affects how quickly/slowly bots take actions:
+  The multiplier affects how quickly/slowly agents take actions:
   - During peak hours on active days: peak_multiplier (e.g., 2.0x = twice as fast)
   - Off-peak times: off_peak_multiplier (e.g., 0.3x = much slower)
 
@@ -196,15 +196,15 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
-  Generates bot attributes from a persona definition.
+  Generates agent attributes from a persona definition.
 
   The index parameter ensures deterministic name generation -
-  the same persona + index will always produce the same bot name.
+  the same persona + index will always produce the same agent name.
 
   ## Examples
 
       iex> persona = Seeds.get_persona("product_photographer")
-      iex> Seeds.generate_bot_from_persona(persona, 1, %{adjectives: [...], nouns: [...]})
+      iex> Seeds.generate_agent_from_persona(persona, 1, %{adjectives: [...], nouns: [...]})
       %{
         name: "Bright Studio",
         username: "studio_bright_1",
@@ -213,7 +213,7 @@ defmodule FloimgFleet.Seeds do
         ...
       }
   """
-  def generate_bot_from_persona(persona, index, data \\ nil) do
+  def generate_agent_from_persona(persona, index, data \\ nil) do
     data = data || load_personas()
     adjectives = data["adjectives"]
     nouns = data["nouns"]
@@ -281,7 +281,7 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
-  Seeds bots into the database.
+  Seeds agents into the database.
 
   This function can be called from a release:
 
@@ -289,7 +289,7 @@ defmodule FloimgFleet.Seeds do
 
   ## Examples
 
-      # Seed 6 bots
+      # Seed 6 agents
       Seeds.seed_agents(6)
 
       # Seed 3 product photographers
@@ -302,7 +302,7 @@ defmodule FloimgFleet.Seeds do
     persona_filter = Keyword.get(opts, :persona)
     provision = Keyword.get(opts, :provision, true)
 
-    IO.puts("\nSeeding #{count} bots...")
+    IO.puts("\nSeeding #{count} agents...")
 
     if persona_filter do
       IO.puts("Using persona: #{persona_filter}")
@@ -311,24 +311,24 @@ defmodule FloimgFleet.Seeds do
     end
 
     if provision do
-      IO.puts("Will provision bots in FSC")
+      IO.puts("Will provision agents in FSC")
     else
       IO.puts("Skipping FSC provisioning (local only)")
     end
 
     IO.puts("")
 
-    bots = generate_bot_batch(count: count, persona: persona_filter)
+    agents = generate_agent_batch(count: count, persona: persona_filter)
 
     results =
-      Enum.map(bots, fn bot_attrs ->
-        case Agents.create_agent(bot_attrs) do
-          {:ok, bot} ->
-            IO.puts("  ✓ Created: #{bot.name} (@#{bot.username}) [#{bot.persona_id}]")
+      Enum.map(agents, fn agent_attrs ->
+        case Agents.create_agent(agent_attrs) do
+          {:ok, agent} ->
+            IO.puts("  ✓ Created: #{agent.name} (@#{agent.username}) [#{agent.persona_id}]")
 
             # Provision in FSC if enabled
             if provision do
-              case Users.provision_agent_user(bot) do
+              case Users.provision_agent_user(agent) do
                 {:ok, _response} ->
                   IO.puts("    ↳ Provisioned in FSC")
 
@@ -337,11 +337,11 @@ defmodule FloimgFleet.Seeds do
               end
             end
 
-            {:ok, bot}
+            {:ok, agent}
 
           {:error, changeset} ->
             errors = format_changeset_errors(changeset)
-            IO.puts("  ✗ Failed to create #{bot_attrs.name}: #{errors}")
+            IO.puts("  ✗ Failed to create #{agent_attrs.name}: #{errors}")
             {:error, changeset}
         end
       end)
@@ -350,7 +350,7 @@ defmodule FloimgFleet.Seeds do
     failed = Enum.count(results, fn {status, _} -> status == :error end)
 
     IO.puts("")
-    IO.puts("Done! Created #{successful} bots, #{failed} failed.")
+    IO.puts("Done! Created #{successful} agents, #{failed} failed.")
 
     {:ok, successful, failed}
   end
@@ -366,22 +366,22 @@ defmodule FloimgFleet.Seeds do
   end
 
   @doc """
-  Generates a batch of bots with weighted persona distribution.
+  Generates a batch of agents with weighted persona distribution.
 
   ## Options
 
-    * `:count` - Number of bots to generate (default: 6)
-    * `:persona` - Specific persona ID to use for all bots (default: nil, uses weighted random)
+    * `:count` - Number of agents to generate (default: 6)
+    * `:persona` - Specific persona ID to use for all agents (default: nil, uses weighted random)
 
   ## Examples
 
-      # Generate 10 bots with weighted distribution
-      Seeds.generate_bot_batch(count: 10)
+      # Generate 10 agents with weighted distribution
+      Seeds.generate_agent_batch(count: 10)
 
       # Generate 3 product photographers
-      Seeds.generate_bot_batch(count: 3, persona: "product_photographer")
+      Seeds.generate_agent_batch(count: 3, persona: "product_photographer")
   """
-  def generate_bot_batch(opts \\ []) do
+  def generate_agent_batch(opts \\ []) do
     count = Keyword.get(opts, :count, 6)
     persona_filter = Keyword.get(opts, :persona, nil)
 
@@ -400,7 +400,7 @@ defmodule FloimgFleet.Seeds do
           weighted_random_persona(personas)
         end
 
-      generate_bot_from_persona(persona, index, data)
+      generate_agent_from_persona(persona, index, data)
     end)
   end
 end

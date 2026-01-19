@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Queries.GetActivity do
   @moduledoc """
-  Query to get bot activity logs.
+  Query to get agent activity logs.
   """
 
   import Ecto.Query
@@ -19,20 +19,20 @@ defmodule FloimgFleet.Agents.Queries.GetActivity do
     limit = Map.get(params, :limit, 50)
 
     AgentActivity
-    |> maybe_filter_bot(params)
+    |> maybe_filter_agent(params)
     |> maybe_filter_event_type(params)
     |> maybe_filter_since(params)
     |> order_by([a], desc: a.inserted_at)
     |> limit(^limit)
-    |> preload(:bot)
+    |> preload(:agent)
     |> Repo.all()
   end
 
-  defp maybe_filter_bot(query, %{agent_id: agent_id}) when not is_nil(agent_id) do
+  defp maybe_filter_agent(query, %{agent_id: agent_id}) when not is_nil(agent_id) do
     where(query, [a], a.agent_id == ^agent_id)
   end
 
-  defp maybe_filter_bot(query, _), do: query
+  defp maybe_filter_agent(query, _), do: query
 
   defp maybe_filter_event_type(query, %{event_type: event_type}) when not is_nil(event_type) do
     where(query, [a], a.event_type == ^event_type)

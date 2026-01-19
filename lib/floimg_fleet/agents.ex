@@ -1,8 +1,8 @@
 defmodule FloimgFleet.Agents do
   @moduledoc """
-  The Bots context.
+  The Agents context.
 
-  This is the core gateway module for all bot-related functionality.
+  This is the core gateway module for all agent-related functionality.
   Follows the CQRS pattern with separate commands and queries.
 
   ## Architecture
@@ -10,17 +10,17 @@ defmodule FloimgFleet.Agents do
   - Commands: Write operations (create, update, delete, start, pause)
   - Queries: Read operations (list, get, activity)
   - Schemas: Ecto schemas for persistence
-  - Runtime: GenServer processes for active bots
+  - Runtime: GenServer processes for active agents
 
   ## Examples
 
-      # Create a bot
-      {:ok, bot} = Agents.create_agent(%{name: "PhotoBot", personality: "enthusiastic"})
+      # Create an agent
+      {:ok, agent} = Agents.create_agent(%{name: "PhotoAgent", personality: "enthusiastic"})
 
-      # Start a bot
-      {:ok, pid} = Agents.start_agent(bot.id)
+      # Start an agent
+      {:ok, pid} = Agents.start_agent(agent.id)
 
-      # Pause all bots
+      # Pause all agents
       :ok = Agents.pause_all()
 
   """
@@ -33,22 +33,22 @@ defmodule FloimgFleet.Agents do
   # ============================================================================
 
   @doc """
-  Lists all bots with optional filtering and pagination.
+  Lists all agents with optional filtering and pagination.
   """
   defdelegate list_agents(params \\ %{}), to: Queries.ListAgents, as: :execute
 
   @doc """
-  Gets a single bot by ID.
+  Gets a single agent by ID.
   """
   defdelegate get_agent(id), to: Queries.GetAgent, as: :execute
 
   @doc """
-  Gets a bot by ID, raising if not found.
+  Gets an agent by ID, raising if not found.
   """
   defdelegate get_agent!(id), to: Queries.GetAgent, as: :execute!
 
   @doc """
-  Gets recent activity for a bot or all bots.
+  Gets recent activity for an agent or all agents.
   """
   defdelegate get_activity(params \\ %{}), to: Queries.GetActivity, as: :execute
 
@@ -57,7 +57,7 @@ defmodule FloimgFleet.Agents do
   # ============================================================================
 
   @doc """
-  Creates a new bot with the given attributes.
+  Creates a new agent with the given attributes.
   """
   def create_agent(attrs) do
     attrs = atomize_keys(attrs)
@@ -65,7 +65,7 @@ defmodule FloimgFleet.Agents do
   end
 
   @doc """
-  Updates an existing bot.
+  Updates an existing agent.
   """
   def update_agent(agent_id, attrs) do
     attrs = atomize_keys(attrs)
@@ -82,35 +82,35 @@ defmodule FloimgFleet.Agents do
   end
 
   @doc """
-  Starts a bot, creating a GenServer process for it.
+  Starts an agent, creating a GenServer process for it.
   """
   def start_agent(agent_id) do
     Commands.StartAgent.execute(%Commands.StartAgent{agent_id: agent_id})
   end
 
   @doc """
-  Pauses a running bot.
+  Pauses a running agent.
   """
   def pause_agent(agent_id) do
     Commands.PauseAgent.execute(%Commands.PauseAgent{agent_id: agent_id})
   end
 
   @doc """
-  Pauses all running bots.
+  Pauses all running agents.
   """
   def pause_all do
     Commands.PauseAll.execute(%Commands.PauseAll{})
   end
 
   @doc """
-  Resumes all paused bots.
+  Resumes all paused agents.
   """
   def resume_all do
     Commands.ResumeAll.execute(%Commands.ResumeAll{})
   end
 
   @doc """
-  Deletes a bot (soft delete).
+  Deletes an agent (soft delete).
   """
   def delete_agent(agent_id) do
     Commands.DeleteAgent.execute(%Commands.DeleteAgent{agent_id: agent_id})

@@ -227,7 +227,7 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     {:stop, :normal, state}
   end
 
-  # Ignore PubSub messages from other bots
+  # Ignore PubSub messages from other agents
   def handle_info({:activity, _, _}, state), do: {:noreply, state}
 
   @impl true
@@ -525,7 +525,7 @@ defmodule FloimgFleet.Runtime.AgentWorker do
   end
 
   defp schedule_next_action(agent) do
-    # Get base delay from bot's configured interval
+    # Get base delay from agent's configured interval
     base_delay =
       Enum.random(
         (agent.min_action_interval_seconds * 1_000)..(agent.max_action_interval_seconds * 1_000)

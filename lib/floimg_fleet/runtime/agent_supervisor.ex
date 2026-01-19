@@ -1,19 +1,19 @@
 defmodule FloimgFleet.Runtime.AgentSupervisor do
   @moduledoc """
-  DynamicSupervisor for bot agents.
+  DynamicSupervisor for Fleet agents.
 
-  Allows starting and stopping bot agents at runtime. Each bot
+  Allows starting and stopping agents at runtime. Each agent
   is a GenServer that manages its own lifecycle and actions.
 
   ## Examples
 
-      # Start a bot
-      {:ok, pid} = AgentSupervisor.start_agent(bot)
+      # Start an agent
+      {:ok, pid} = AgentSupervisor.start_agent(agent)
 
-      # Stop a bot
+      # Stop an agent
       :ok = AgentSupervisor.stop_agent(pid)
 
-      # Count running bots
+      # Count running agents
       AgentSupervisor.count_children()
 
   """
@@ -34,14 +34,14 @@ defmodule FloimgFleet.Runtime.AgentSupervisor do
   end
 
   @doc """
-  Starts a bot agent for the given bot configuration.
+  Starts an agent for the given agent configuration.
   """
-  def start_agent(bot) do
-    DynamicSupervisor.start_child(@me, {AgentWorker, bot})
+  def start_agent(agent) do
+    DynamicSupervisor.start_child(@me, {AgentWorker, agent})
   end
 
   @doc """
-  Stops a bot agent by PID or PID string (stored in database).
+  Stops an agent by PID or PID string (stored in database).
   """
   def stop_agent(pid) when is_pid(pid) do
     DynamicSupervisor.terminate_child(@me, pid)
@@ -53,7 +53,7 @@ defmodule FloimgFleet.Runtime.AgentSupervisor do
   end
 
   @doc """
-  Stops all running bot agents.
+  Stops all running agents.
   """
   def stop_all do
     for {_, pid, _, _} <- DynamicSupervisor.which_children(@me) do
@@ -64,14 +64,14 @@ defmodule FloimgFleet.Runtime.AgentSupervisor do
   end
 
   @doc """
-  Returns the count of running bot agents.
+  Returns the count of running agents.
   """
   def count_children do
     DynamicSupervisor.count_children(@me).active
   end
 
   @doc """
-  Lists all running bot PIDs.
+  Lists all running agent PIDs.
   """
   def list_children do
     for {_, pid, _, _} <- DynamicSupervisor.which_children(@me), do: pid

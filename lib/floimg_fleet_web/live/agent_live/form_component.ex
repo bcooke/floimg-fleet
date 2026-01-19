@@ -10,7 +10,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
     <div>
       <h2 class="text-xl font-bold mb-4">{@title}</h2>
 
-      <.form for={@form} id="bot-form" phx-target={@myself} phx-change="validate" phx-submit="save">
+      <.form for={@form} id="agent-form" phx-target={@myself} phx-change="validate" phx-submit="save">
         <div class="space-y-4">
           <.input
             field={@form[:name]}
@@ -143,55 +143,55 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
   end
 
   @impl true
-  def update(%{bot: bot} = assigns, socket) do
+  def update(%{agent: agent} = assigns, socket) do
     {:ok,
      socket
      |> assign(assigns)
      |> assign_new(:form, fn ->
-       to_form(Agent.changeset(bot, %{}), as: :bot)
+       to_form(Agent.changeset(agent, %{}), as: :agent)
      end)}
   end
 
   @impl true
-  def handle_event("validate", %{"bot" => bot_params}, socket) do
-    bot_params = normalize_params(bot_params)
+  def handle_event("validate", %{"agent" => agent_params}, socket) do
+    agent_params = normalize_params(agent_params)
 
     changeset =
-      socket.assigns.bot
-      |> Agent.changeset(bot_params)
+      socket.assigns.agent
+      |> Agent.changeset(agent_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
+    {:noreply, assign(socket, form: to_form(changeset, as: :agent))}
   end
 
-  def handle_event("save", %{"bot" => bot_params}, socket) do
-    bot_params = normalize_params(bot_params)
-    save_bot(socket, socket.assigns.action, bot_params)
+  def handle_event("save", %{"agent" => agent_params}, socket) do
+    agent_params = normalize_params(agent_params)
+    save_agent(socket, socket.assigns.action, agent_params)
   end
 
-  defp save_bot(socket, :edit, bot_params) do
-    case Agents.update_agent(socket.assigns.bot.id, bot_params) do
-      {:ok, _bot} ->
+  defp save_agent(socket, :edit, agent_params) do
+    case Agents.update_agent(socket.assigns.agent.id, agent_params) do
+      {:ok, _agent} ->
         {:noreply,
          socket
          |> put_flash(:info, "Agent updated successfully")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
+        {:noreply, assign(socket, form: to_form(changeset, as: :agent))}
     end
   end
 
-  defp save_bot(socket, :new, bot_params) do
-    case Agents.create_agent(bot_params) do
-      {:ok, _bot} ->
+  defp save_agent(socket, :new, agent_params) do
+    case Agents.create_agent(agent_params) do
+      {:ok, _agent} ->
         {:noreply,
          socket
          |> put_flash(:info, "Agent created successfully")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
+        {:noreply, assign(socket, form: to_form(changeset, as: :agent))}
     end
   end
 

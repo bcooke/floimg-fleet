@@ -1,6 +1,6 @@
 defmodule FloimgFleet.Agents.Commands.UpdateAgent do
   @moduledoc """
-  Command to update an existing bot.
+  Command to update an existing agent.
   """
 
   alias FloimgFleet.Repo
@@ -29,7 +29,7 @@ defmodule FloimgFleet.Agents.Commands.UpdateAgent do
   @spec execute(t()) :: {:ok, Agent.t()} | {:error, term()}
   def execute(%__MODULE__{agent_id: agent_id} = command) do
     case GetAgent.execute(agent_id) do
-      {:ok, bot} ->
+      {:ok, agent} ->
         attrs =
           command
           |> Map.from_struct()
@@ -37,7 +37,7 @@ defmodule FloimgFleet.Agents.Commands.UpdateAgent do
           |> Enum.reject(fn {_, v} -> is_nil(v) end)
           |> Map.new()
 
-        bot
+        agent
         |> Agent.changeset(attrs)
         |> Repo.update()
 

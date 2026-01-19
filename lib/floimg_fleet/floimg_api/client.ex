@@ -12,27 +12,27 @@ defmodule FloimgFleet.FloImgAPI.Client do
   @doc """
   Make a GET request to the FloImg API.
   """
-  def get(bot, path, opts \\ []) do
-    request(bot, :get, path, opts)
+  def get(agent, path, opts \\ []) do
+    request(agent, :get, path, opts)
   end
 
   @doc """
   Make a POST request to the FloImg API.
   """
-  def post(bot, path, body, opts \\ []) do
-    request(bot, :post, path, Keyword.put(opts, :json, body))
+  def post(agent, path, body, opts \\ []) do
+    request(agent, :post, path, Keyword.put(opts, :json, body))
   end
 
   @doc """
   Make a DELETE request to the FloImg API.
   """
-  def delete(bot, path, opts \\ []) do
-    request(bot, :delete, path, opts)
+  def delete(agent, path, opts \\ []) do
+    request(agent, :delete, path, opts)
   end
 
-  defp request(bot, method, path, opts) do
+  defp request(agent, method, path, opts) do
     url = build_url(path)
-    headers = build_headers(bot)
+    headers = build_headers(agent)
 
     start_time = System.monotonic_time(:millisecond)
 
@@ -49,7 +49,7 @@ defmodule FloimgFleet.FloImgAPI.Client do
 
     duration = System.monotonic_time(:millisecond) - start_time
 
-    log_request(method, path, bot, duration, result)
+    log_request(method, path, agent, duration, result)
 
     result
   end
@@ -59,7 +59,7 @@ defmodule FloimgFleet.FloImgAPI.Client do
     "#{base_url}#{path}"
   end
 
-  defp build_headers(bot) do
+  defp build_headers(agent) do
     service_token = config(:service_token)
 
     headers = [
@@ -78,8 +78,8 @@ defmodule FloimgFleet.FloImgAPI.Client do
 
     # Add agent ID header so the API can look up the agent's FSC user
     # Uses username instead of ID because FSC users are provisioned with email: {username}@agent.floimg.local
-    if bot do
-      [{"x-agent-id", bot.username} | headers]
+    if agent do
+      [{"x-agent-id", agent.username} | headers]
     else
       headers
     end

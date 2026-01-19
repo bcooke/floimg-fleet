@@ -2,7 +2,7 @@ defmodule FloimgFleet.FloImgAPI do
   @moduledoc """
   HTTP client for interacting with the FloImg gallery API.
 
-  This module provides the interface for bots to perform actions on FloImg:
+  This module provides the interface for agents to perform actions on FloImg:
   - Create and view gallery posts
   - Like and comment on content
   - Browse and discover content
@@ -11,18 +11,18 @@ defmodule FloimgFleet.FloImgAPI do
 
       config :floimg_fleet, FloimgFleet.FloImgAPI,
         base_url: "https://api.floimg.com",
-        bot_secret: System.get_env("FLOIMG_BOT_SECRET")
+        service_token: System.get_env("FLOIMG_SERVICE_TOKEN")
 
   ## Usage
 
       # Create a post
-      FloImgAPI.create_post(bot, %{image_url: "...", caption: "..."})
+      FloImgAPI.create_post(agent, %{image_url: "...", caption: "..."})
 
       # Like a post
-      FloImgAPI.like_post(bot, post_id)
+      FloImgAPI.like_post(agent, post_id)
 
       # Get feed
-      FloImgAPI.get_feed(bot)
+      FloImgAPI.get_feed(agent)
   """
 
   alias FloimgFleet.FloImgAPI.{Gallery, Interactions, Workflows}
@@ -30,47 +30,47 @@ defmodule FloimgFleet.FloImgAPI do
   @doc """
   Create a new gallery post.
   """
-  defdelegate create_post(bot, attrs), to: Gallery
+  defdelegate create_post(agent, attrs), to: Gallery
 
   @doc """
   Get a single post by ID.
   """
-  defdelegate get_post(bot, post_id), to: Gallery
+  defdelegate get_post(agent, post_id), to: Gallery
 
   @doc """
   List gallery posts with optional filters.
   """
-  defdelegate list_posts(bot, opts \\ []), to: Gallery
+  defdelegate list_posts(agent, opts \\ []), to: Gallery
 
   @doc """
-  Get personalized feed for a bot.
+  Get personalized feed for an agent.
   """
-  defdelegate get_feed(bot, opts \\ []), to: Gallery
+  defdelegate get_feed(agent, opts \\ []), to: Gallery
 
   @doc """
   Get trending/popular posts.
   """
-  defdelegate get_trending(bot, opts \\ []), to: Gallery
+  defdelegate get_trending(agent, opts \\ []), to: Gallery
 
   @doc """
   Like a post.
   """
-  defdelegate like_post(bot, post_id), to: Interactions
+  defdelegate like_post(agent, post_id), to: Interactions
 
   @doc """
   Unlike a post.
   """
-  defdelegate unlike_post(bot, post_id), to: Interactions
+  defdelegate unlike_post(agent, post_id), to: Interactions
 
   @doc """
   Add a comment to a post.
   """
-  defdelegate add_comment(bot, post_id, content), to: Interactions
+  defdelegate add_comment(agent, post_id, content), to: Interactions
 
   @doc """
   Get comments for a post.
   """
-  defdelegate get_comments(bot, post_id, opts \\ []), to: Interactions
+  defdelegate get_comments(agent, post_id, opts \\ []), to: Interactions
 
   # ============================================================================
   # Workflow Execution
@@ -79,7 +79,7 @@ defmodule FloimgFleet.FloImgAPI do
   @doc """
   Execute a workflow pipeline and return generated image URLs.
   """
-  defdelegate execute_workflow(bot, steps, name \\ nil), to: Workflows
+  defdelegate execute_workflow(agent, steps, name \\ nil), to: Workflows
 
   @doc """
   Build a simple AI image generation workflow.

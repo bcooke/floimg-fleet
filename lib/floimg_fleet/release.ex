@@ -19,7 +19,7 @@ defmodule FloimgFleet.Release do
   end
 
   @doc """
-  Seeds bots from persona definitions.
+  Seeds agents from persona definitions.
 
   Usage from release:
       /app/bin/floimg_fleet eval 'FloimgFleet.Release.seed()'

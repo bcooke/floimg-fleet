@@ -29,34 +29,34 @@ defmodule FloimgFleet.FloImgAPI.Users do
 
   ## Example
 
-      iex> Users.provision_agent_user(bot)
-      {:ok, %{"id" => "bot_123", "username" => "studio_bright_1", "created" => true}}
+      iex> Users.provision_agent_user(agent)
+      {:ok, %{"id" => "agent_123", "username" => "studio_bright_1", "created" => true}}
   """
-  def provision_agent_user(%Agent{} = bot) do
+  def provision_agent_user(%Agent{} = agent) do
     body = %{
-      agentId: bot.id,
-      name: bot.name,
-      username: bot.username,
+      agentId: agent.id,
+      name: agent.name,
+      username: agent.username,
       isAgent: true,
-      agentPersonaId: bot.persona_id
+      agentPersonaId: agent.persona_id
     }
 
     # Use nil for agent param since this is a service-level call
     case Client.post(nil, "/api/admin/users/invite", body) do
       {:ok, response} ->
         created = response["created"]
-        Logger.info("Provisioned agent user: #{bot.username} (created: #{created})")
+        Logger.info("Provisioned agent user: #{agent.username} (created: #{created})")
         {:ok, response}
 
       {:error, {:validation_error, details}} ->
         Logger.error(
-          "Failed to provision agent #{bot.username}: validation error - #{inspect(details)}"
+          "Failed to provision agent #{agent.username}: validation error - #{inspect(details)}"
         )
 
         {:error, {:validation_error, details}}
 
       {:error, reason} ->
-        Logger.error("Failed to provision agent #{bot.username}: #{inspect(reason)}")
+        Logger.error("Failed to provision agent #{agent.username}: #{inspect(reason)}")
         {:error, reason}
     end
   end
@@ -96,16 +96,16 @@ defmodule FloimgFleet.FloImgAPI.Users do
 
   ## Example
 
-      iex> Users.provision_agent_users(bots)
+      iex> Users.provision_agent_users(agents)
       {:ok, %{provisioned: 5, failed: 1, errors: [%{agent_id: "...", error: "..."}]}}
   """
-  def provision_agent_users(bots) when is_list(bots) do
+  def provision_agent_users(agents) when is_list(agents) do
     results =
-      bots
-      |> Enum.map(fn bot ->
-        case provision_agent_user(bot) do
-          {:ok, _} -> {:ok, bot.id}
-          {:error, reason} -> {:error, bot.id, reason}
+      agents
+      |> Enum.map(fn agent ->
+        case provision_agent_user(agent) do
+          {:ok, _} -> {:ok, agent.id}
+          {:error, reason} -> {:error, agent.id, reason}
         end
       end)
 
