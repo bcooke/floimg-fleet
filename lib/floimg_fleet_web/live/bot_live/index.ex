@@ -303,10 +303,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
                   id={dom_id}
                   class="text-sm p-2 bg-base-300 rounded"
                 >
+                  <span class="mr-1">{activity.emoji}</span>
                   <span class="font-medium">{activity.bot_name || "Bot"}</span>
-                  <span class="text-base-content/60">{activity.action}</span>
+                  <span class="text-base-content/60">{activity.message}</span>
                   <div class="text-xs text-base-content/40">
-                    {format_time(activity.inserted_at)}
+                    {format_time(activity.timestamp)}
                   </div>
                 </div>
                 <div :if={@activities_empty} class="text-center text-base-content/60 py-4">

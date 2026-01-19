@@ -87,6 +87,14 @@ defmodule FloimgFleet.Runtime.BotAgent do
     {:noreply, state}
   end
 
+  def handle_info(:wake, %{bot: bot} = state) do
+    # Resume from budget-limited sleep
+    broadcast(:started, "Waking up from budget sleep!", bot)
+    update_bot_status(bot, :running, self())
+    schedule_think(@default_think_delay)
+    {:noreply, %{state | paused: false}}
+  end
+
   def handle_info(:think, %{bot: bot} = state) do
     action = decide_action(bot)
     broadcast(:thought, "I want to #{action}", bot)
@@ -102,13 +110,50 @@ defmodule FloimgFleet.Runtime.BotAgent do
     case do_post(bot) do
       {:ok, post} ->
         broadcast(:post, "Posted a new image: #{post["caption"] || "untitled"}", bot)
+        schedule_next_action(bot)
+        {:noreply, %{state | last_action: :post}}
+
+      # Fleet budget errors - pause or wait
+      {:error, {:fleet_paused, reason}} ->
+        broadcast(:paused, "Fleet paused: #{reason}", bot)
+        update_bot_status(bot, :paused, self())
+        {:noreply, %{state | paused: true}}
+
+      {:error, {:fleet_daily_budget, reset_at}} ->
+        broadcast(:thought, "Fleet daily budget reached, sleeping until reset...", bot)
+        schedule_wake_at(reset_at)
+        update_bot_status(bot, :paused, self())
+        {:noreply, %{state | paused: true}}
+
+      {:error, {:fleet_monthly_budget, reset_at}} ->
+        broadcast(:thought, "Fleet monthly budget reached, sleeping until next month...", bot)
+        schedule_wake_at(reset_at)
+        update_bot_status(bot, :paused, self())
+        {:noreply, %{state | paused: true}}
+
+      {:error, {:agent_daily_limit, body}} ->
+        used = get_in(body, ["usage", "used"]) || "?"
+        limit = get_in(body, ["usage", "limit"]) || "?"
+        reset_at = body["resetAt"]
+        broadcast(:thought, "Daily limit reached (#{used}/#{limit}), sleeping until reset...", bot)
+        schedule_wake_at(reset_at)
+        update_bot_status(bot, :paused, self())
+        {:noreply, %{state | paused: true}}
+
+      {:error, {:agent_monthly_limit, body}} ->
+        used = get_in(body, ["usage", "used"]) || "?"
+        limit = get_in(body, ["usage", "limit"]) || "?"
+        reset_at = body["resetAt"]
+        broadcast(:thought, "Monthly limit reached (#{used}/#{limit}), sleeping until next month...", bot)
+        schedule_wake_at(reset_at)
+        update_bot_status(bot, :paused, self())
+        {:noreply, %{state | paused: true}}
 
       {:error, reason} ->
         broadcast(:error, "Failed to post: #{inspect(reason)}", bot)
+        schedule_next_action(bot)
+        {:noreply, %{state | last_action: :post}}
     end
-
-    schedule_next_action(bot)
-    {:noreply, %{state | last_action: :post}}
   end
 
   def handle_info(:comment, %{bot: bot} = state) do
@@ -427,6 +472,26 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   defp schedule_think(delay) do
     Process.send_after(self(), :think, delay)
+  end
+
+  defp schedule_wake_at(nil) do
+    # No reset time provided, wake in 1 hour
+    Process.send_after(self(), :wake, :timer.hours(1))
+  end
+
+  defp schedule_wake_at(reset_at_string) when is_binary(reset_at_string) do
+    case DateTime.from_iso8601(reset_at_string) do
+      {:ok, reset_at, _offset} ->
+        now = DateTime.utc_now()
+        delay_ms = max(1_000, DateTime.diff(reset_at, now, :millisecond))
+        # Cap at 24 hours to avoid overflow issues
+        capped_delay = min(delay_ms, :timer.hours(24))
+        Process.send_after(self(), :wake, capped_delay)
+
+      {:error, _} ->
+        # Invalid datetime, wake in 1 hour
+        Process.send_after(self(), :wake, :timer.hours(1))
+    end
   end
 
   defp schedule_next_action(bot) do
