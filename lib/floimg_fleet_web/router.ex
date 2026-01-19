@@ -18,10 +18,10 @@ defmodule FloimgFleetWeb.Router do
     pipe_through :browser
 
     live "/", AgentLive.Index, :index
-    live "/bots", AgentLive.Index, :index
-    live "/bots/new", AgentLive.Index, :new
-    live "/bots/:id", AgentLive.Show, :show
-    live "/bots/:id/edit", AgentLive.Show, :edit
+    live "/agents", AgentLive.Index, :index
+    live "/agents/new", AgentLive.Index, :new
+    live "/agents/:id", AgentLive.Show, :show
+    live "/agents/:id/edit", AgentLive.Show, :edit
   end
 
   # Health check endpoint (no auth required)

@@ -52,7 +52,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
       {:error, :not_found} ->
         socket
         |> put_flash(:error, "Agent not found")
-        |> push_navigate(to: ~p"/bots")
+        |> push_navigate(to: ~p"/agents")
     end
   end
 
@@ -210,7 +210,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
           <button phx-click="resume_all" class="btn btn-success btn-sm">
             Start All
           </button>
-          <.link navigate={~p"/bots/new"} class="btn btn-primary btn-sm">
+          <.link navigate={~p"/agents/new"} class="btn btn-primary btn-sm">
             New Agent
           </.link>
         </div>
@@ -236,7 +236,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                   <tbody id="agents" phx-update="stream">
                     <tr :for={{dom_id, agent} <- @streams.agents} id={dom_id}>
                       <td>
-                        <.link navigate={~p"/bots/#{agent.id}"} class="link link-hover">
+                        <.link navigate={~p"/agents/#{agent.id}"} class="link link-hover">
                           {agent.name}
                         </.link>
                       </td>
@@ -272,7 +272,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                               Pause
                             </button>
                           <% end %>
-                          <.link navigate={~p"/bots/#{agent.id}/edit"} class="btn btn-ghost btn-xs">
+                          <.link navigate={~p"/agents/#{agent.id}/edit"} class="btn btn-ghost btn-xs">
                             Edit
                           </.link>
                           <button
@@ -324,7 +324,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
       :if={@live_action in [:new, :edit]}
       id="agent-modal"
       show
-      on_cancel={JS.navigate(~p"/bots")}
+      on_cancel={JS.navigate(~p"/agents")}
     >
       <.live_component
         module={FloimgFleetWeb.AgentLive.FormComponent}
@@ -332,7 +332,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
         title={@page_title}
         action={@live_action}
         agent={@agent}
-        navigate={~p"/bots"}
+        navigate={~p"/agents"}
       />
     </.modal>
     """

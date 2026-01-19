@@ -23,7 +23,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
         {:ok,
          socket
          |> put_flash(:error, "Agent not found")
-         |> push_navigate(to: ~p"/bots")}
+         |> push_navigate(to: ~p"/agents")}
     end
   end
 
@@ -92,7 +92,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
     ~H"""
     <div class="container mx-auto px-4 py-8">
       <div class="mb-6">
-        <.link navigate={~p"/bots"} class="btn btn-ghost btn-sm gap-2">
+        <.link navigate={~p"/agents"} class="btn btn-ghost btn-sm gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -122,7 +122,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
                   <%= if @agent.status == :running do %>
                     <button phx-click="pause" class="btn btn-warning btn-sm">Pause</button>
                   <% end %>
-                  <.link navigate={~p"/bots/#{@agent.id}/edit"} class="btn btn-ghost btn-sm">
+                  <.link navigate={~p"/agents/#{@agent.id}/edit"} class="btn btn-ghost btn-sm">
                     Edit
                   </.link>
                 </div>
@@ -231,7 +231,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
       :if={@live_action == :edit}
       id="agent-modal"
       show
-      on_cancel={JS.navigate(~p"/bots/#{@agent.id}")}
+      on_cancel={JS.navigate(~p"/agents/#{@agent.id}")}
     >
       <.live_component
         module={FloimgFleetWeb.AgentLive.FormComponent}
@@ -239,7 +239,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
         title={@page_title}
         action={@live_action}
         agent={@agent}
-        navigate={~p"/bots/#{@agent.id}"}
+        navigate={~p"/agents/#{@agent.id}"}
       />
     </.modal>
     """
