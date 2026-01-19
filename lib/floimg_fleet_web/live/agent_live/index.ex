@@ -304,7 +304,7 @@ defmodule FloimgFleetWeb.AgentLive.Index do
                   class="text-sm p-2 bg-base-300 rounded"
                 >
                   <span class="mr-1">{activity.emoji}</span>
-                  <span class="font-medium">{activity.bot_name || "Bot"}</span>
+                  <span class="font-medium">{activity.agent_name || "Agent"}</span>
                   <span class="text-base-content/60">{activity.message}</span>
                   <div class="text-xs text-base-content/40">
                     {format_time(activity.timestamp)}

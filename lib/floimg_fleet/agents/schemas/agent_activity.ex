@@ -1,8 +1,8 @@
 defmodule FloimgFleet.Agents.Schemas.AgentActivity do
   @moduledoc """
-  Schema for bot activity logs.
+  Schema for agent activity logs.
 
-  Records every action a bot takes for analytics, debugging,
+  Records every action an agent takes for analytics, debugging,
   and real-time activity feeds.
   """
 
@@ -14,8 +14,8 @@ defmodule FloimgFleet.Agents.Schemas.AgentActivity do
 
   @event_types [:thought, :action, :post, :comment, :like, :error, :started, :paused, :stopped]
 
-  schema "bot_activities" do
-    belongs_to(:bot, FloimgFleet.Agents.Schemas.Agent)
+  schema "agent_activities" do
+    belongs_to(:agent, FloimgFleet.Agents.Schemas.Agent)
 
     field(:event_type, Ecto.Enum, values: @event_types)
     field(:message, :string)

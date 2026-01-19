@@ -1,6 +1,6 @@
 defmodule FloimgFleet.FloImgAPI.Users do
   @moduledoc """
-  User provisioning API for Fleet bots.
+  User provisioning API for Fleet agents.
 
   Uses the standard admin users endpoint with service token authentication.
   The endpoint accepts either admin session OR service token with "users:write" permission.
@@ -12,15 +12,15 @@ defmodule FloimgFleet.FloImgAPI.Users do
   require Logger
 
   @doc """
-  Provisions a bot user in FSC.
+  Provisions an agent user in FSC.
 
-  Creates a user account for the bot so it can post to the gallery.
-  This is idempotent - calling it with the same bot will return the
+  Creates a user account for the agent so it can post to the gallery.
+  This is idempotent - calling it with the same agent will return the
   existing user if already provisioned.
 
   ## Parameters
 
-    * `bot` - A Bot struct with id, name, username, and persona_id
+    * `agent` - An Agent struct with id, name, username, and persona_id
 
   ## Returns
 
@@ -41,32 +41,32 @@ defmodule FloimgFleet.FloImgAPI.Users do
       agentPersonaId: bot.persona_id
     }
 
-    # Use nil for bot param since this is a service-level call
+    # Use nil for agent param since this is a service-level call
     case Client.post(nil, "/api/admin/users/invite", body) do
       {:ok, response} ->
         created = response["created"]
-        Logger.info("Provisioned bot user: #{bot.username} (created: #{created})")
+        Logger.info("Provisioned agent user: #{bot.username} (created: #{created})")
         {:ok, response}
 
       {:error, {:validation_error, details}} ->
         Logger.error(
-          "Failed to provision bot #{bot.username}: validation error - #{inspect(details)}"
+          "Failed to provision agent #{bot.username}: validation error - #{inspect(details)}"
         )
 
         {:error, {:validation_error, details}}
 
       {:error, reason} ->
-        Logger.error("Failed to provision bot #{bot.username}: #{inspect(reason)}")
+        Logger.error("Failed to provision agent #{bot.username}: #{inspect(reason)}")
         {:error, reason}
     end
   end
 
   @doc """
-  Deletes a bot user from FSC.
+  Deletes an agent user from FSC.
 
   ## Parameters
 
-    * `agent_id` - The bot ID (same as FSC user ID)
+    * `agent_id` - The agent ID (same as FSC user ID)
 
   ## Returns
 
@@ -76,7 +76,7 @@ defmodule FloimgFleet.FloImgAPI.Users do
   def delete_agent_user(agent_id) when is_binary(agent_id) do
     case Client.delete(nil, "/api/admin/users/#{agent_id}") do
       {:ok, response} ->
-        Logger.info("Deleted bot user: #{agent_id}")
+        Logger.info("Deleted agent user: #{agent_id}")
         {:ok, response}
 
       {:error, {:not_found, _}} ->
@@ -84,13 +84,13 @@ defmodule FloimgFleet.FloImgAPI.Users do
         {:ok, %{"deleted" => true}}
 
       {:error, reason} ->
-        Logger.error("Failed to delete bot user #{agent_id}: #{inspect(reason)}")
+        Logger.error("Failed to delete agent user #{agent_id}: #{inspect(reason)}")
         {:error, reason}
     end
   end
 
   @doc """
-  Provisions multiple bot users in FSC.
+  Provisions multiple agent users in FSC.
 
   Returns a summary of successes and failures.
 

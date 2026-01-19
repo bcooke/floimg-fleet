@@ -541,10 +541,10 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     schedule_think(delay)
   end
 
-  defp broadcast(event_type, message, bot) do
+  defp broadcast(event_type, message, agent) do
     activity = %{
-      agent_id: bot.id,
-      bot_name: bot.name,
+      agent_id: agent.id,
+      agent_name: agent.name,
       event_type: event_type,
       message: message,
       emoji: emoji_for(event_type),
@@ -553,7 +553,7 @@ defmodule FloimgFleet.Runtime.AgentWorker do
 
     Phoenix.PubSub.broadcast(FloimgFleet.PubSub, @channel, {:activity, event_type, activity})
 
-    Logger.info("[#{bot.name}] #{emoji_for(event_type)} #{message}")
+    Logger.info("[#{agent.name}] #{emoji_for(event_type)} #{message}")
   end
 
   defp emoji_for(:started), do: "🌅"

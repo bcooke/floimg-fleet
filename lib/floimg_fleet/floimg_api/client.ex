@@ -154,7 +154,7 @@ defmodule FloimgFleet.FloImgAPI.Client do
     {:error, {:request_failed, reason}}
   end
 
-  defp log_request(method, path, bot, duration, result) do
+  defp log_request(method, path, agent, duration, result) do
     status =
       case result do
         {:ok, _} -> "ok"
@@ -162,11 +162,11 @@ defmodule FloimgFleet.FloImgAPI.Client do
         {:error, {code, _, _}} -> "error:#{code}"
       end
 
-    bot_name = if bot, do: bot.name, else: "anonymous"
+    agent_name = if agent, do: agent.name, else: "anonymous"
 
     Logger.debug(
       "FloImgAPI #{String.upcase(to_string(method))} #{path} " <>
-        "[bot=#{bot_name}] [#{duration}ms] [#{status}]"
+        "[agent=#{agent_name}] [#{duration}ms] [#{status}]"
     )
   end
 
