@@ -250,10 +250,28 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   defp do_post(bot) do
     # Try workflow execution first, fall back to placeholder if it fails
+    # Budget errors are propagated up for proper handling (pause/wake scheduling)
     case execute_workflow_post(bot) do
       {:ok, post} ->
         {:ok, post}
 
+      # Propagate budget errors for proper handling in the caller
+      {:error, {:fleet_paused, _}} = error ->
+        error
+
+      {:error, {:fleet_daily_budget, _}} = error ->
+        error
+
+      {:error, {:fleet_monthly_budget, _}} = error ->
+        error
+
+      {:error, {:agent_daily_limit, _}} = error ->
+        error
+
+      {:error, {:agent_monthly_limit, _}} = error ->
+        error
+
+      # Other errors fall back to placeholder
       {:error, reason} ->
         Logger.warning(
           "[#{bot.name}] Workflow execution failed: #{inspect(reason)}, using placeholder"
