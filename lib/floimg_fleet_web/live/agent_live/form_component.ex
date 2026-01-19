@@ -34,7 +34,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
             field={@form[:personality]}
             type="textarea"
             label="Personality"
-            placeholder="Describe the bot's personality..."
+            placeholder="Describe the agent's personality..."
             rows="3"
             class="textarea textarea-bordered w-full"
           />
@@ -134,7 +134,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
         <div class="modal-action">
           <.link navigate={@navigate} class="btn btn-ghost">Cancel</.link>
           <button type="submit" class="btn btn-primary" phx-disable-with="Saving...">
-            Save Bot
+            Save Agent
           </button>
         </div>
       </.form>
@@ -174,7 +174,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
       {:ok, _bot} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Bot updated successfully")
+         |> put_flash(:info, "Agent updated successfully")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -187,7 +187,7 @@ defmodule FloimgFleetWeb.AgentLive.FormComponent do
       {:ok, _bot} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Bot created successfully")
+         |> put_flash(:info, "Agent created successfully")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
