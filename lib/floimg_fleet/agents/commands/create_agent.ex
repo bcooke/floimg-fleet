@@ -1,11 +1,11 @@
-defmodule FloimgFleet.Bots.Commands.CreateBot do
+defmodule FloimgFleet.Agents.Commands.CreateAgent do
   @moduledoc """
   Command to create a new bot.
 
   ## Examples
 
       iex> execute(%CreateBot{name: "PhotoBot", username: "photobot"})
-      {:ok, %Bot{}}
+      {:ok, %Agent{}}
 
       iex> execute(%CreateBot{name: "", username: "photobot"})
       {:error, %Ecto.Changeset{}}
@@ -13,7 +13,7 @@ defmodule FloimgFleet.Bots.Commands.CreateBot do
   """
 
   alias FloimgFleet.Repo
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents.Schemas.Agent
 
   @enforce_keys [:name, :username]
   defstruct [
@@ -44,12 +44,12 @@ defmodule FloimgFleet.Bots.Commands.CreateBot do
           max_action_interval_seconds: pos_integer()
         }
 
-  @spec execute(t()) :: {:ok, Bot.t()} | {:error, Ecto.Changeset.t()}
+  @spec execute(t()) :: {:ok, Agent.t()} | {:error, Ecto.Changeset.t()}
   def execute(%__MODULE__{} = command) do
     attrs = Map.from_struct(command)
 
-    %Bot{}
-    |> Bot.changeset(attrs)
+    %Agent{}
+    |> Agent.changeset(attrs)
     |> Repo.insert()
   end
 end

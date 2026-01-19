@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Bots do
+defmodule FloimgFleet.Agents do
   @moduledoc """
   The Bots context.
 
@@ -15,18 +15,18 @@ defmodule FloimgFleet.Bots do
   ## Examples
 
       # Create a bot
-      {:ok, bot} = Bots.create_bot(%{name: "PhotoBot", personality: "enthusiastic"})
+      {:ok, bot} = Agents.create_agent(%{name: "PhotoBot", personality: "enthusiastic"})
 
       # Start a bot
-      {:ok, pid} = Bots.start_bot(bot.id)
+      {:ok, pid} = Agents.start_agent(bot.id)
 
       # Pause all bots
-      :ok = Bots.pause_all()
+      :ok = Agents.pause_all()
 
   """
 
-  alias FloimgFleet.Bots.Queries
-  alias FloimgFleet.Bots.Commands
+  alias FloimgFleet.Agents.Queries
+  alias FloimgFleet.Agents.Commands
 
   # ============================================================================
   # Queries
@@ -35,17 +35,17 @@ defmodule FloimgFleet.Bots do
   @doc """
   Lists all bots with optional filtering and pagination.
   """
-  defdelegate list_bots(params \\ %{}), to: Queries.ListBots, as: :execute
+  defdelegate list_agents(params \\ %{}), to: Queries.ListAgents, as: :execute
 
   @doc """
   Gets a single bot by ID.
   """
-  defdelegate get_bot(id), to: Queries.GetBot, as: :execute
+  defdelegate get_agent(id), to: Queries.GetAgent, as: :execute
 
   @doc """
   Gets a bot by ID, raising if not found.
   """
-  defdelegate get_bot!(id), to: Queries.GetBot, as: :execute!
+  defdelegate get_agent!(id), to: Queries.GetAgent, as: :execute!
 
   @doc """
   Gets recent activity for a bot or all bots.
@@ -59,18 +59,18 @@ defmodule FloimgFleet.Bots do
   @doc """
   Creates a new bot with the given attributes.
   """
-  def create_bot(attrs) do
+  def create_agent(attrs) do
     attrs = atomize_keys(attrs)
-    Commands.CreateBot.execute(struct(Commands.CreateBot, attrs))
+    Commands.CreateAgent.execute(struct(Commands.CreateAgent, attrs))
   end
 
   @doc """
   Updates an existing bot.
   """
-  def update_bot(bot_id, attrs) do
+  def update_agent(agent_id, attrs) do
     attrs = atomize_keys(attrs)
-    attrs = Map.put(attrs, :bot_id, bot_id)
-    Commands.UpdateBot.execute(struct(Commands.UpdateBot, attrs))
+    attrs = Map.put(attrs, :agent_id, agent_id)
+    Commands.UpdateAgent.execute(struct(Commands.UpdateAgent, attrs))
   end
 
   # Converts string keys to atoms for struct creation
@@ -84,15 +84,15 @@ defmodule FloimgFleet.Bots do
   @doc """
   Starts a bot, creating a GenServer process for it.
   """
-  def start_bot(bot_id) do
-    Commands.StartBot.execute(%Commands.StartBot{bot_id: bot_id})
+  def start_agent(agent_id) do
+    Commands.StartAgent.execute(%Commands.StartAgent{agent_id: agent_id})
   end
 
   @doc """
   Pauses a running bot.
   """
-  def pause_bot(bot_id) do
-    Commands.PauseBot.execute(%Commands.PauseBot{bot_id: bot_id})
+  def pause_agent(agent_id) do
+    Commands.PauseAgent.execute(%Commands.PauseAgent{agent_id: agent_id})
   end
 
   @doc """
@@ -112,7 +112,7 @@ defmodule FloimgFleet.Bots do
   @doc """
   Deletes a bot (soft delete).
   """
-  def delete_bot(bot_id) do
-    Commands.DeleteBot.execute(%Commands.DeleteBot{bot_id: bot_id})
+  def delete_agent(agent_id) do
+    Commands.DeleteAgent.execute(%Commands.DeleteAgent{agent_id: agent_id})
   end
 end

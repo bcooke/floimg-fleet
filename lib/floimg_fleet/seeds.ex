@@ -285,18 +285,18 @@ defmodule FloimgFleet.Seeds do
 
   This function can be called from a release:
 
-      /app/bin/floimg_fleet eval 'FloimgFleet.Seeds.seed_bots(6)'
+      /app/bin/floimg_fleet eval 'FloimgFleet.Seeds.seed_agents(6)'
 
   ## Examples
 
       # Seed 6 bots
-      Seeds.seed_bots(6)
+      Seeds.seed_agents(6)
 
       # Seed 3 product photographers
-      Seeds.seed_bots(3, persona: "product_photographer")
+      Seeds.seed_agents(3, persona: "product_photographer")
   """
-  def seed_bots(count \\ 6, opts \\ []) do
-    alias FloimgFleet.Bots
+  def seed_agents(count \\ 6, opts \\ []) do
+    alias FloimgFleet.Agents
     alias FloimgFleet.FloImgAPI.Users
 
     persona_filter = Keyword.get(opts, :persona)
@@ -322,13 +322,13 @@ defmodule FloimgFleet.Seeds do
 
     results =
       Enum.map(bots, fn bot_attrs ->
-        case Bots.create_bot(bot_attrs) do
+        case Agents.create_agent(bot_attrs) do
           {:ok, bot} ->
             IO.puts("  ✓ Created: #{bot.name} (@#{bot.username}) [#{bot.persona_id}]")
 
             # Provision in FSC if enabled
             if provision do
-              case Users.provision_bot_user(bot) do
+              case Users.provision_agent_user(bot) do
                 {:ok, _response} ->
                   IO.puts("    ↳ Provisioned in FSC")
 

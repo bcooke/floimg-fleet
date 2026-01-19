@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Runtime.BotAgent do
+defmodule FloimgFleet.Runtime.AgentWorker do
   @moduledoc """
   GenServer for an individual bot.
 
@@ -25,8 +25,8 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   use GenServer, restart: :transient
 
-  alias FloimgFleet.Bots
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents
+  alias FloimgFleet.Agents.Schemas.Agent
   alias FloimgFleet.FloImgAPI
   alias FloimgFleet.LLM.Client, as: LLM
   alias FloimgFleet.Seeds
@@ -43,7 +43,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
   # Client API
   # ============================================================================
 
-  def start_link(%Bot{} = bot) do
+  def start_link(%Agent{} = bot) do
     GenServer.start_link(__MODULE__, bot)
   end
 
@@ -69,7 +69,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
     Phoenix.PubSub.subscribe(FloimgFleet.PubSub, @channel)
 
     # Update bot status in database
-    update_bot_status(bot, :running, self())
+    update_agent_status(bot, :running, self())
 
     # Broadcast that we're waking up
     broadcast(:started, "Waking up!", bot)
@@ -90,7 +90,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
   def handle_info(:wake, %{bot: bot} = state) do
     # Resume from budget-limited sleep
     broadcast(:started, "Waking up from budget sleep!", bot)
-    update_bot_status(bot, :running, self())
+    update_agent_status(bot, :running, self())
     schedule_think(@default_think_delay)
     {:noreply, %{state | paused: false}}
   end
@@ -116,37 +116,49 @@ defmodule FloimgFleet.Runtime.BotAgent do
       # Fleet budget errors - pause or wait
       {:error, {:fleet_paused, reason}} ->
         broadcast(:paused, "Fleet paused: #{reason}", bot)
-        update_bot_status(bot, :paused, self())
+        update_agent_status(bot, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:fleet_daily_budget, reset_at}} ->
         broadcast(:thought, "Fleet daily budget reached, sleeping until reset...", bot)
         schedule_wake_at(reset_at)
-        update_bot_status(bot, :paused, self())
+        update_agent_status(bot, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:fleet_monthly_budget, reset_at}} ->
         broadcast(:thought, "Fleet monthly budget reached, sleeping until next month...", bot)
         schedule_wake_at(reset_at)
-        update_bot_status(bot, :paused, self())
+        update_agent_status(bot, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:agent_daily_limit, body}} ->
         used = get_in(body, ["usage", "used"]) || "?"
         limit = get_in(body, ["usage", "limit"]) || "?"
         reset_at = body["resetAt"]
-        broadcast(:thought, "Daily limit reached (#{used}/#{limit}), sleeping until reset...", bot)
+
+        broadcast(
+          :thought,
+          "Daily limit reached (#{used}/#{limit}), sleeping until reset...",
+          bot
+        )
+
         schedule_wake_at(reset_at)
-        update_bot_status(bot, :paused, self())
+        update_agent_status(bot, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, {:agent_monthly_limit, body}} ->
         used = get_in(body, ["usage", "used"]) || "?"
         limit = get_in(body, ["usage", "limit"]) || "?"
         reset_at = body["resetAt"]
-        broadcast(:thought, "Monthly limit reached (#{used}/#{limit}), sleeping until next month...", bot)
+
+        broadcast(
+          :thought,
+          "Monthly limit reached (#{used}/#{limit}), sleeping until next month...",
+          bot
+        )
+
         schedule_wake_at(reset_at)
-        update_bot_status(bot, :paused, self())
+        update_agent_status(bot, :paused, self())
         {:noreply, %{state | paused: true}}
 
       {:error, reason} ->
@@ -210,7 +222,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   def handle_info(:sleep, %{bot: bot} = state) do
     broadcast(:stopped, "Going to sleep...", bot)
-    update_bot_status(bot, :idle, nil)
+    update_agent_status(bot, :idle, nil)
 
     {:stop, :normal, state}
   end
@@ -221,14 +233,14 @@ defmodule FloimgFleet.Runtime.BotAgent do
   @impl true
   def handle_cast(:pause, %{bot: bot} = state) do
     broadcast(:paused, "Pausing...", bot)
-    update_bot_status(bot, :paused, self())
+    update_agent_status(bot, :paused, self())
 
     {:noreply, %{state | paused: true}}
   end
 
   def handle_cast(:resume, %{bot: bot} = state) do
     broadcast(:started, "Resuming!", bot)
-    update_bot_status(bot, :running, self())
+    update_agent_status(bot, :running, self())
 
     {:noreply, %{state | paused: false}}
   end
@@ -240,7 +252,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   @impl true
   def terminate(_reason, %{bot: bot}) do
-    update_bot_status(bot, :idle, nil)
+    update_agent_status(bot, :idle, nil)
     :ok
   end
 
@@ -531,7 +543,7 @@ defmodule FloimgFleet.Runtime.BotAgent do
 
   defp broadcast(event_type, message, bot) do
     activity = %{
-      bot_id: bot.id,
+      agent_id: bot.id,
       bot_name: bot.name,
       event_type: event_type,
       message: message,
@@ -555,12 +567,12 @@ defmodule FloimgFleet.Runtime.BotAgent do
   defp emoji_for(:error), do: "❌"
   defp emoji_for(_), do: "•"
 
-  defp update_bot_status(bot, status, pid) do
+  defp update_agent_status(bot, status, pid) do
     pid_string = if pid, do: inspect(pid), else: nil
 
     # Update in database (fire and forget for now)
     Task.start(fn ->
-      Bots.update_bot(bot.id, %{status: status, pid: pid_string})
+      Agents.update_agent(bot.id, %{status: status, pid: pid_string})
     end)
   end
 end

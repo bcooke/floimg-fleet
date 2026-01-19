@@ -1,14 +1,14 @@
-defmodule FloimgFleet.Bots.Commands.UpdateBot do
+defmodule FloimgFleet.Agents.Commands.UpdateAgent do
   @moduledoc """
   Command to update an existing bot.
   """
 
   alias FloimgFleet.Repo
-  alias FloimgFleet.Bots.Schemas.Bot
-  alias FloimgFleet.Bots.Queries.GetBot
+  alias FloimgFleet.Agents.Schemas.Agent
+  alias FloimgFleet.Agents.Queries.GetAgent
 
   defstruct [
-    :bot_id,
+    :agent_id,
     :name,
     :username,
     :personality,
@@ -26,19 +26,19 @@ defmodule FloimgFleet.Bots.Commands.UpdateBot do
 
   @type t :: %__MODULE__{}
 
-  @spec execute(t()) :: {:ok, Bot.t()} | {:error, term()}
-  def execute(%__MODULE__{bot_id: bot_id} = command) do
-    case GetBot.execute(bot_id) do
+  @spec execute(t()) :: {:ok, Agent.t()} | {:error, term()}
+  def execute(%__MODULE__{agent_id: agent_id} = command) do
+    case GetAgent.execute(agent_id) do
       {:ok, bot} ->
         attrs =
           command
           |> Map.from_struct()
-          |> Map.delete(:bot_id)
+          |> Map.delete(:agent_id)
           |> Enum.reject(fn {_, v} -> is_nil(v) end)
           |> Map.new()
 
         bot
-        |> Bot.changeset(attrs)
+        |> Agent.changeset(attrs)
         |> Repo.update()
 
       {:error, _} = error ->

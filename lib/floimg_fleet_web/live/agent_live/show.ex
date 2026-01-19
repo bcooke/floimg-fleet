@@ -1,7 +1,7 @@
-defmodule FloimgFleetWeb.BotLive.Show do
+defmodule FloimgFleetWeb.AgentLive.Show do
   use FloimgFleetWeb, :live_view
 
-  alias FloimgFleet.Bots
+  alias FloimgFleet.Agents
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -9,9 +9,9 @@ defmodule FloimgFleetWeb.BotLive.Show do
       Phoenix.PubSub.subscribe(FloimgFleet.PubSub, "fleet:activity")
     end
 
-    case Bots.get_bot(id) do
+    case Agents.get_agent(id) do
       {:ok, bot} ->
-        activities = Bots.get_activity(%{bot_id: id, limit: 50})
+        activities = Agents.get_activity(%{agent_id: id, limit: 50})
 
         {:ok,
          socket
@@ -42,8 +42,8 @@ defmodule FloimgFleetWeb.BotLive.Show do
   end
 
   @impl true
-  def handle_info({:bot_activity, activity}, socket) do
-    if activity.bot_id == socket.assigns.bot.id do
+  def handle_info({:agent_activity, activity}, socket) do
+    if activity.agent_id == socket.assigns.bot.id do
       {:noreply, stream_insert(socket, :activities, activity, at: 0)}
     else
       {:noreply, socket}
@@ -62,7 +62,7 @@ defmodule FloimgFleetWeb.BotLive.Show do
 
   @impl true
   def handle_event("start", _params, socket) do
-    case Bots.start_bot(socket.assigns.bot.id) do
+    case Agents.start_agent(socket.assigns.bot.id) do
       {:ok, bot} ->
         {:noreply,
          socket
@@ -75,7 +75,7 @@ defmodule FloimgFleetWeb.BotLive.Show do
   end
 
   def handle_event("pause", _params, socket) do
-    case Bots.pause_bot(socket.assigns.bot.id) do
+    case Agents.pause_agent(socket.assigns.bot.id) do
       {:ok, bot} ->
         {:noreply,
          socket
@@ -234,7 +234,7 @@ defmodule FloimgFleetWeb.BotLive.Show do
       on_cancel={JS.navigate(~p"/bots/#{@bot.id}")}
     >
       <.live_component
-        module={FloimgFleetWeb.BotLive.FormComponent}
+        module={FloimgFleetWeb.AgentLive.FormComponent}
         id={@bot.id}
         title={@page_title}
         action={@live_action}

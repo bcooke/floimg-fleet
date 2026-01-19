@@ -1,24 +1,24 @@
-defmodule FloimgFleet.Bots.Queries.GetActivity do
+defmodule FloimgFleet.Agents.Queries.GetActivity do
   @moduledoc """
   Query to get bot activity logs.
   """
 
   import Ecto.Query
   alias FloimgFleet.Repo
-  alias FloimgFleet.Bots.Schemas.BotActivity
+  alias FloimgFleet.Agents.Schemas.AgentActivity
 
   @type params :: %{
-          optional(:bot_id) => String.t(),
+          optional(:agent_id) => String.t(),
           optional(:event_type) => atom(),
           optional(:limit) => pos_integer(),
           optional(:since) => DateTime.t()
         }
 
-  @spec execute(params()) :: [BotActivity.t()]
+  @spec execute(params()) :: [AgentActivity.t()]
   def execute(params \\ %{}) do
     limit = Map.get(params, :limit, 50)
 
-    BotActivity
+    AgentActivity
     |> maybe_filter_bot(params)
     |> maybe_filter_event_type(params)
     |> maybe_filter_since(params)
@@ -28,8 +28,8 @@ defmodule FloimgFleet.Bots.Queries.GetActivity do
     |> Repo.all()
   end
 
-  defp maybe_filter_bot(query, %{bot_id: bot_id}) when not is_nil(bot_id) do
-    where(query, [a], a.bot_id == ^bot_id)
+  defp maybe_filter_bot(query, %{agent_id: agent_id}) when not is_nil(agent_id) do
+    where(query, [a], a.agent_id == ^agent_id)
   end
 
   defp maybe_filter_bot(query, _), do: query

@@ -1,8 +1,8 @@
-defmodule FloimgFleetWeb.BotLive.Index do
+defmodule FloimgFleetWeb.AgentLive.Index do
   use FloimgFleetWeb, :live_view
 
-  alias FloimgFleet.Bots
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents
+  alias FloimgFleet.Agents.Schemas.Agent
   alias FloimgFleet.Seeds
 
   @impl true
@@ -11,7 +11,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
       Phoenix.PubSub.subscribe(FloimgFleet.PubSub, "fleet:activity")
     end
 
-    bots = Bots.list_bots()
+    bots = Agents.list_agents()
     persona_stats = count_by_persona(bots)
 
     {:ok,
@@ -21,7 +21,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
      |> assign(:persona_filter, nil)
      |> assign(:persona_stats, persona_stats)
      |> assign(:persona_ids, Seeds.list_persona_ids())
-     |> stream(:bots, bots)
+     |> stream(:agents, bots)
      |> stream(:activities, [], at: 0)}
   end
 
@@ -39,11 +39,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Bot")
-    |> assign(:bot, %Bot{})
+    |> assign(:bot, %Agent{})
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    case Bots.get_bot(id) do
+    case Agents.get_agent(id) do
       {:ok, bot} ->
         socket
         |> assign(:page_title, "Edit #{bot.name}")
@@ -57,14 +57,14 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   @impl true
-  def handle_info({:bot_activity, activity}, socket) do
+  def handle_info({:agent_activity, activity}, socket) do
     {:noreply,
      socket
      |> assign(:activities_empty, false)
      |> stream_insert(:activities, activity, at: 0)}
   end
 
-  # Handle activity events from BotAgent broadcasts
+  # Handle activity events from AgentWorker broadcasts
   def handle_info({:activity, _event_type, %{} = activity}, socket) do
     # Convert to activity stream format with unique ID
     activity_with_id = Map.put(activity, :id, System.unique_integer([:positive]))
@@ -76,24 +76,24 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_info({:bot_started, bot}, socket) do
-    {:noreply, stream_insert(socket, :bots, bot)}
+    {:noreply, stream_insert(socket, :agents, bot)}
   end
 
   def handle_info({:bot_stopped, bot}, socket) do
-    {:noreply, stream_insert(socket, :bots, bot)}
+    {:noreply, stream_insert(socket, :agents, bot)}
   end
 
   def handle_info({:bot_updated, bot}, socket) do
-    {:noreply, stream_insert(socket, :bots, bot)}
+    {:noreply, stream_insert(socket, :agents, bot)}
   end
 
   @impl true
   def handle_event("start", %{"id" => id}, socket) do
-    case Bots.start_bot(id) do
+    case Agents.start_agent(id) do
       {:ok, bot} ->
         {:noreply,
          socket
-         |> stream_insert(:bots, bot)
+         |> stream_insert(:agents, bot)
          |> put_flash(:info, "Bot #{bot.name} started")}
 
       {:error, reason} ->
@@ -102,13 +102,13 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_event("pause", %{"id" => id}, socket) do
-    case Bots.pause_bot(id) do
+    case Agents.pause_agent(id) do
       :ok ->
-        {:ok, bot} = Bots.get_bot(id)
+        {:ok, bot} = Agents.get_agent(id)
 
         {:noreply,
          socket
-         |> stream_insert(:bots, bot)
+         |> stream_insert(:agents, bot)
          |> put_flash(:info, "Bot #{bot.name} paused")}
 
       {:error, reason} ->
@@ -117,11 +117,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
-    case Bots.delete_bot(id) do
+    case Agents.delete_agent(id) do
       {:ok, bot} ->
         {:noreply,
          socket
-         |> stream_delete(:bots, bot)
+         |> stream_delete(:agents, bot)
          |> put_flash(:info, "Bot #{bot.name} deleted")}
 
       {:error, reason} ->
@@ -130,11 +130,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_event("pause_all", _params, socket) do
-    case Bots.pause_all() do
+    case Agents.pause_all() do
       {:ok, count} ->
         {:noreply,
          socket
-         |> stream(:bots, Bots.list_bots(), reset: true)
+         |> stream(:agents, Agents.list_agents(), reset: true)
          |> put_flash(:info, "Paused #{count} bots")}
 
       {:error, reason} ->
@@ -143,11 +143,11 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_event("resume_all", _params, socket) do
-    case Bots.resume_all() do
+    case Agents.resume_all() do
       {:ok, count} ->
         {:noreply,
          socket
-         |> stream(:bots, Bots.list_bots(), reset: true)
+         |> stream(:agents, Agents.list_agents(), reset: true)
          |> put_flash(:info, "Started #{count} bots")}
 
       {:error, reason} ->
@@ -156,24 +156,24 @@ defmodule FloimgFleetWeb.BotLive.Index do
   end
 
   def handle_event("filter_persona", %{"persona" => ""}, socket) do
-    bots = Bots.list_bots()
+    bots = Agents.list_agents()
 
     {:noreply,
      socket
      |> assign(:persona_filter, nil)
      |> assign(:persona_stats, count_by_persona(bots))
-     |> stream(:bots, bots, reset: true)}
+     |> stream(:agents, bots, reset: true)}
   end
 
   def handle_event("filter_persona", %{"persona" => persona_id}, socket) do
-    all_bots = Bots.list_bots()
+    all_bots = Agents.list_agents()
     filtered_bots = Enum.filter(all_bots, fn bot -> bot.persona_id == persona_id end)
 
     {:noreply,
      socket
      |> assign(:persona_filter, persona_id)
      |> assign(:persona_stats, count_by_persona(all_bots))
-     |> stream(:bots, filtered_bots, reset: true)}
+     |> stream(:agents, filtered_bots, reset: true)}
   end
 
   @impl true
@@ -322,7 +322,7 @@ defmodule FloimgFleetWeb.BotLive.Index do
 
     <.modal :if={@live_action in [:new, :edit]} id="bot-modal" show on_cancel={JS.navigate(~p"/bots")}>
       <.live_component
-        module={FloimgFleetWeb.BotLive.FormComponent}
+        module={FloimgFleetWeb.AgentLive.FormComponent}
         id={@bot.id || :new}
         title={@page_title}
         action={@live_action}

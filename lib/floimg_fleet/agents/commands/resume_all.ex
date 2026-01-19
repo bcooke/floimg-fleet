@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Bots.Commands.ResumeAll do
+defmodule FloimgFleet.Agents.Commands.ResumeAll do
   @moduledoc """
   Command to start/resume all bots.
 
@@ -6,9 +6,9 @@ defmodule FloimgFleet.Bots.Commands.ResumeAll do
   and resumes any that are paused.
   """
 
-  alias FloimgFleet.Bots.Queries.ListBots
-  alias FloimgFleet.Runtime.BotSupervisor
-  alias FloimgFleet.Runtime.BotAgent
+  alias FloimgFleet.Agents.Queries.ListAgents
+  alias FloimgFleet.Runtime.AgentSupervisor
+  alias FloimgFleet.Runtime.AgentWorker
 
   defstruct []
 
@@ -17,14 +17,14 @@ defmodule FloimgFleet.Bots.Commands.ResumeAll do
   @spec execute(t()) :: {:ok, non_neg_integer()}
   def execute(%__MODULE__{}) do
     # Get all bots from DB
-    bots = ListBots.execute(%{})
+    bots = ListAgents.execute(%{})
 
     # Get currently running PIDs
-    running_pids = BotSupervisor.list_children()
+    running_pids = AgentSupervisor.list_children()
 
     # Resume already running bots
     for pid <- running_pids do
-      BotAgent.resume(pid)
+      AgentWorker.resume(pid)
     end
 
     # Start bots that aren't running
@@ -33,7 +33,7 @@ defmodule FloimgFleet.Bots.Commands.ResumeAll do
     started_count =
       bots
       |> Enum.reduce(0, fn bot, count ->
-        case BotSupervisor.start_bot(bot) do
+        case AgentSupervisor.start_agent(bot) do
           {:ok, _pid} -> count + 1
           {:error, {:already_started, _}} -> count
           {:error, _} -> count

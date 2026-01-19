@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Fleet.SeedBots do
+defmodule Mix.Tasks.Fleet.SeedAgents do
   @shortdoc "Seeds bots from personas.json"
 
   @moduledoc """
@@ -7,16 +7,16 @@ defmodule Mix.Tasks.Fleet.SeedBots do
   ## Usage
 
       # Seed 6 bots with weighted persona distribution (default)
-      mix fleet.seed_bots
+      mix fleet.seed_agents
 
       # Seed a specific number of bots
-      mix fleet.seed_bots --count 10
+      mix fleet.seed_agents --count 10
 
       # Seed bots of a specific persona only
-      mix fleet.seed_bots --persona product_photographer --count 3
+      mix fleet.seed_agents --persona product_photographer --count 3
 
       # List available personas
-      mix fleet.seed_bots --list
+      mix fleet.seed_agents --list
 
   ## Options
 
@@ -27,16 +27,16 @@ defmodule Mix.Tasks.Fleet.SeedBots do
   ## Examples
 
       # Create one bot per persona
-      mix fleet.seed_bots --count 6
+      mix fleet.seed_agents --count 6
 
       # Create a swarm of social marketers
-      mix fleet.seed_bots --persona social_marketer --count 5
+      mix fleet.seed_agents --persona social_marketer --count 5
 
   """
 
   use Mix.Task
 
-  alias FloimgFleet.Bots
+  alias FloimgFleet.Agents
   alias FloimgFleet.Seeds
 
   @switches [
@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Fleet.SeedBots do
         list_personas()
 
       true ->
-        seed_bots(opts)
+        seed_agents(opts)
     end
   end
 
@@ -81,7 +81,7 @@ defmodule Mix.Tasks.Fleet.SeedBots do
     end
   end
 
-  defp seed_bots(opts) do
+  defp seed_agents(opts) do
     count = Keyword.get(opts, :count, 6)
     persona_filter = Keyword.get(opts, :persona)
 
@@ -99,7 +99,7 @@ defmodule Mix.Tasks.Fleet.SeedBots do
 
     results =
       Enum.map(bots, fn bot_attrs ->
-        case Bots.create_bot(bot_attrs) do
+        case Agents.create_agent(bot_attrs) do
           {:ok, bot} ->
             Mix.shell().info("  ✓ Created: #{bot.name} (@#{bot.username}) [#{bot.persona_id}]")
             {:ok, bot}

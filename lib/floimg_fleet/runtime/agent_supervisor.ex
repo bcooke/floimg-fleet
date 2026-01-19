@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Runtime.BotSupervisor do
+defmodule FloimgFleet.Runtime.AgentSupervisor do
   @moduledoc """
   DynamicSupervisor for bot agents.
 
@@ -8,19 +8,19 @@ defmodule FloimgFleet.Runtime.BotSupervisor do
   ## Examples
 
       # Start a bot
-      {:ok, pid} = BotSupervisor.start_bot(bot)
+      {:ok, pid} = AgentSupervisor.start_agent(bot)
 
       # Stop a bot
-      :ok = BotSupervisor.stop_bot(pid)
+      :ok = AgentSupervisor.stop_agent(pid)
 
       # Count running bots
-      BotSupervisor.count_children()
+      AgentSupervisor.count_children()
 
   """
 
   use DynamicSupervisor
 
-  alias FloimgFleet.Runtime.BotAgent
+  alias FloimgFleet.Runtime.AgentWorker
 
   @me __MODULE__
 
@@ -36,20 +36,20 @@ defmodule FloimgFleet.Runtime.BotSupervisor do
   @doc """
   Starts a bot agent for the given bot configuration.
   """
-  def start_bot(bot) do
-    DynamicSupervisor.start_child(@me, {BotAgent, bot})
+  def start_agent(bot) do
+    DynamicSupervisor.start_child(@me, {AgentWorker, bot})
   end
 
   @doc """
   Stops a bot agent by PID or PID string (stored in database).
   """
-  def stop_bot(pid) when is_pid(pid) do
+  def stop_agent(pid) when is_pid(pid) do
     DynamicSupervisor.terminate_child(@me, pid)
   end
 
-  def stop_bot(pid_string) when is_binary(pid_string) do
+  def stop_agent(pid_string) when is_binary(pid_string) do
     pid = string_to_pid(pid_string)
-    stop_bot(pid)
+    stop_agent(pid)
   end
 
   @doc """

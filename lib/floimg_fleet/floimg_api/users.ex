@@ -7,7 +7,7 @@ defmodule FloimgFleet.FloImgAPI.Users do
   """
 
   alias FloimgFleet.FloImgAPI.Client
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents.Schemas.Agent
 
   require Logger
 
@@ -29,10 +29,10 @@ defmodule FloimgFleet.FloImgAPI.Users do
 
   ## Example
 
-      iex> Users.provision_bot_user(bot)
+      iex> Users.provision_agent_user(bot)
       {:ok, %{"id" => "bot_123", "username" => "studio_bright_1", "created" => true}}
   """
-  def provision_bot_user(%Bot{} = bot) do
+  def provision_agent_user(%Agent{} = bot) do
     body = %{
       agentId: bot.id,
       name: bot.name,
@@ -66,17 +66,17 @@ defmodule FloimgFleet.FloImgAPI.Users do
 
   ## Parameters
 
-    * `bot_id` - The bot ID (same as FSC user ID)
+    * `agent_id` - The bot ID (same as FSC user ID)
 
   ## Returns
 
     * `{:ok, %{deleted: true}}`
     * `{:error, reason}`
   """
-  def delete_bot_user(bot_id) when is_binary(bot_id) do
-    case Client.delete(nil, "/api/admin/users/#{bot_id}") do
+  def delete_agent_user(agent_id) when is_binary(agent_id) do
+    case Client.delete(nil, "/api/admin/users/#{agent_id}") do
       {:ok, response} ->
-        Logger.info("Deleted bot user: #{bot_id}")
+        Logger.info("Deleted bot user: #{agent_id}")
         {:ok, response}
 
       {:error, {:not_found, _}} ->
@@ -84,7 +84,7 @@ defmodule FloimgFleet.FloImgAPI.Users do
         {:ok, %{"deleted" => true}}
 
       {:error, reason} ->
-        Logger.error("Failed to delete bot user #{bot_id}: #{inspect(reason)}")
+        Logger.error("Failed to delete bot user #{agent_id}: #{inspect(reason)}")
         {:error, reason}
     end
   end
@@ -96,14 +96,14 @@ defmodule FloimgFleet.FloImgAPI.Users do
 
   ## Example
 
-      iex> Users.provision_bot_users(bots)
-      {:ok, %{provisioned: 5, failed: 1, errors: [%{bot_id: "...", error: "..."}]}}
+      iex> Users.provision_agent_users(bots)
+      {:ok, %{provisioned: 5, failed: 1, errors: [%{agent_id: "...", error: "..."}]}}
   """
-  def provision_bot_users(bots) when is_list(bots) do
+  def provision_agent_users(bots) when is_list(bots) do
     results =
       bots
       |> Enum.map(fn bot ->
-        case provision_bot_user(bot) do
+        case provision_agent_user(bot) do
           {:ok, _} -> {:ok, bot.id}
           {:error, reason} -> {:error, bot.id, reason}
         end
@@ -115,7 +115,9 @@ defmodule FloimgFleet.FloImgAPI.Users do
     errors =
       results
       |> Enum.filter(fn r -> match?({:error, _, _}, r) end)
-      |> Enum.map(fn {:error, bot_id, reason} -> %{bot_id: bot_id, error: inspect(reason)} end)
+      |> Enum.map(fn {:error, agent_id, reason} ->
+        %{agent_id: agent_id, error: inspect(reason)}
+      end)
 
     {:ok, %{provisioned: provisioned, failed: failed, errors: errors}}
   end

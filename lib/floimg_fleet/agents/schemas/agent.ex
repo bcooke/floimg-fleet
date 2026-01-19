@@ -1,4 +1,4 @@
-defmodule FloimgFleet.Bots.Schemas.Bot do
+defmodule FloimgFleet.Agents.Schemas.Agent do
   @moduledoc """
   Schema for a bot configuration.
 

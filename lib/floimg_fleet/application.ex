@@ -14,7 +14,7 @@ defmodule FloimgFleet.Application do
       {DNSCluster, query: Application.get_env(:floimg_fleet, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: FloimgFleet.PubSub},
       # Bot supervision tree
-      FloimgFleet.Runtime.BotSupervisor,
+      FloimgFleet.Runtime.AgentSupervisor,
       # Start to serve requests, typically the last entry
       FloimgFleetWeb.Endpoint
     ]

@@ -1,8 +1,8 @@
-defmodule FloimgFleetWeb.BotLive.FormComponent do
+defmodule FloimgFleetWeb.AgentLive.FormComponent do
   use FloimgFleetWeb, :live_component
 
-  alias FloimgFleet.Bots
-  alias FloimgFleet.Bots.Schemas.Bot
+  alias FloimgFleet.Agents
+  alias FloimgFleet.Agents.Schemas.Agent
 
   @impl true
   def render(assigns) do
@@ -148,7 +148,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign_new(:form, fn ->
-       to_form(Bot.changeset(bot, %{}), as: :bot)
+       to_form(Agent.changeset(bot, %{}), as: :bot)
      end)}
   end
 
@@ -158,7 +158,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
 
     changeset =
       socket.assigns.bot
-      |> Bot.changeset(bot_params)
+      |> Agent.changeset(bot_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, form: to_form(changeset, as: :bot))}
@@ -170,7 +170,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
   end
 
   defp save_bot(socket, :edit, bot_params) do
-    case Bots.update_bot(socket.assigns.bot.id, bot_params) do
+    case Agents.update_agent(socket.assigns.bot.id, bot_params) do
       {:ok, _bot} ->
         {:noreply,
          socket
@@ -183,7 +183,7 @@ defmodule FloimgFleetWeb.BotLive.FormComponent do
   end
 
   defp save_bot(socket, :new, bot_params) do
-    case Bots.create_bot(bot_params) do
+    case Agents.create_agent(bot_params) do
       {:ok, _bot} ->
         {:noreply,
          socket

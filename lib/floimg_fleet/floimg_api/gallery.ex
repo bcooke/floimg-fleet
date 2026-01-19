@@ -83,11 +83,12 @@ defmodule FloimgFleet.FloImgAPI.Gallery do
 
     case Client.get(agent, path) do
       {:ok, %{"items" => items}} ->
-        {:ok, %{
-          "items" => Enum.map(items, &normalize_item/1),
-          "page" => page,
-          "per_page" => per_page
-        }}
+        {:ok,
+         %{
+           "items" => Enum.map(items, &normalize_item/1),
+           "page" => page,
+           "per_page" => per_page
+         }}
 
       error ->
         error
