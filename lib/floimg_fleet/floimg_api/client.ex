@@ -76,10 +76,10 @@ defmodule FloimgFleet.FloImgAPI.Client do
         headers
       end
 
-    # Add bot username header so the API can look up the bot's FSC user
+    # Add agent ID header so the API can look up the agent's FSC user
     # Uses username instead of ID because FSC users are provisioned with email: {username}@agent.floimg.local
     if bot do
-      [{"x-bot-id", bot.username} | headers]
+      [{"x-agent-id", bot.username} | headers]
     else
       headers
     end
