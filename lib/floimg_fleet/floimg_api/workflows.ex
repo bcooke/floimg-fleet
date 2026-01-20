@@ -26,7 +26,7 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
       steps = [
         %{
           "kind" => "generate",
-          "generator" => "openai-images",
+          "generator" => "openai",
           "params" => %{
             "prompt" => "A sunset over mountains",
             "model" => "dall-e-3",
@@ -77,7 +77,7 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
     [
       %{
         "kind" => "generate",
-        "generator" => "openai-images",
+        "generator" => "openai",
         "params" => %{
           "prompt" => prompt,
           "model" => model,
@@ -106,7 +106,7 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
     [
       %{
         "kind" => "generate",
-        "generator" => "openai-images",
+        "generator" => "openai",
         "params" => %{
           "prompt" => prompt,
           "model" => model,
