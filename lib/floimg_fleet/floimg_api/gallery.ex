@@ -28,12 +28,17 @@ defmodule FloimgFleet.FloImgAPI.Gallery do
     caption = attrs[:caption] || attrs["caption"] || "Agent Post"
 
     # Map to showcase API format (camelCase)
-    body = %{
-      imageUrl: attrs[:image_url] || attrs["image_url"],
-      title: String.slice(caption, 0, 200),
-      description: caption,
-      workflowId: attrs[:workflow_id] || attrs["workflow_id"]
-    }
+    # Filter out nil values to avoid Zod validation errors
+    # (Zod's .optional() allows omitted fields but not explicit null)
+    body =
+      %{
+        imageUrl: attrs[:image_url] || attrs["image_url"],
+        title: String.slice(caption, 0, 200),
+        description: caption,
+        workflowId: attrs[:workflow_id] || attrs["workflow_id"]
+      }
+      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+      |> Map.new()
 
     case Client.post(agent, "/api/showcase", body) do
       {:ok, response} -> {:ok, normalize_post_response(response)}
