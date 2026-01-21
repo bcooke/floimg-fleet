@@ -133,4 +133,165 @@ defmodule FloimgFleet.FloImgAPI.Workflows do
       }
     ]
   end
+
+  @doc """
+  Build a workflow for social media content - generates at high res and resizes for Instagram.
+  Demonstrates FloImg's resize capabilities.
+  """
+  def build_social_media_workflow(prompt, opts \\ []) do
+    model = Keyword.get(opts, :model, "dall-e-3")
+    quality = Keyword.get(opts, :quality, "standard")
+
+    [
+      %{
+        "kind" => "generate",
+        "generator" => "openai",
+        "params" => %{
+          "prompt" => prompt,
+          "model" => model,
+          "size" => "1024x1024",
+          "quality" => quality
+        },
+        "out" => "original"
+      },
+      %{
+        "kind" => "transform",
+        "op" => "resize",
+        "in" => "original",
+        "params" => %{
+          "width" => 1080,
+          "height" => 1080,
+          "fit" => "cover"
+        },
+        "out" => "instagram_square"
+      },
+      %{
+        "kind" => "save",
+        "in" => "instagram_square",
+        "destination" => "cloud"
+      }
+    ]
+  end
+
+  @doc """
+  Build a workflow for product photography - generates and applies color adjustments.
+  Demonstrates FloImg's transform capabilities.
+  """
+  def build_product_workflow(prompt, opts \\ []) do
+    model = Keyword.get(opts, :model, "dall-e-3")
+    quality = Keyword.get(opts, :quality, "hd")
+
+    [
+      %{
+        "kind" => "generate",
+        "generator" => "openai",
+        "params" => %{
+          "prompt" => prompt,
+          "model" => model,
+          "size" => "1024x1024",
+          "quality" => quality
+        },
+        "out" => "product_shot"
+      },
+      %{
+        "kind" => "transform",
+        "op" => "adjust",
+        "in" => "product_shot",
+        "params" => %{
+          "brightness" => 1.05,
+          "contrast" => 1.1,
+          "saturation" => 1.1
+        },
+        "out" => "enhanced"
+      },
+      %{
+        "kind" => "save",
+        "in" => "enhanced",
+        "destination" => "cloud"
+      }
+    ]
+  end
+
+  @doc """
+  Build a workflow for pixel art - generates and applies pixel-perfect resize.
+  Demonstrates FloImg's nearest-neighbor scaling.
+  """
+  def build_pixel_art_workflow(prompt, opts \\ []) do
+    model = Keyword.get(opts, :model, "dall-e-3")
+    quality = Keyword.get(opts, :quality, "standard")
+
+    [
+      %{
+        "kind" => "generate",
+        "generator" => "openai",
+        "params" => %{
+          "prompt" => prompt,
+          "model" => model,
+          "size" => "1024x1024",
+          "quality" => quality
+        },
+        "out" => "pixel_art"
+      },
+      %{
+        "kind" => "transform",
+        "op" => "resize",
+        "in" => "pixel_art",
+        "params" => %{
+          "width" => 512,
+          "height" => 512,
+          "fit" => "contain",
+          "kernel" => "nearest"
+        },
+        "out" => "scaled"
+      },
+      %{
+        "kind" => "save",
+        "in" => "scaled",
+        "destination" => "cloud"
+      }
+    ]
+  end
+
+  @doc """
+  Build a workflow for AI art - generates at HD quality.
+  Demonstrates FloImg's high-quality generation.
+  """
+  def build_ai_art_workflow(prompt, opts \\ []) do
+    model = Keyword.get(opts, :model, "dall-e-3")
+
+    [
+      %{
+        "kind" => "generate",
+        "generator" => "openai",
+        "params" => %{
+          "prompt" => prompt,
+          "model" => model,
+          "size" => "1792x1024",
+          "quality" => "hd"
+        },
+        "out" => "artwork"
+      },
+      %{
+        "kind" => "save",
+        "in" => "artwork",
+        "destination" => "cloud"
+      }
+    ]
+  end
+
+  @doc """
+  Get workflow builder for a specific persona.
+  Returns {builder_function, opts} tuple.
+  """
+  def workflow_for_persona(persona_id) do
+    case persona_id do
+      "product_photographer" -> {:build_product_workflow, [quality: "hd"]}
+      "social_marketer" -> {:build_social_media_workflow, []}
+      "indie_game_dev" -> {:build_pixel_art_workflow, []}
+      "ai_artist" -> {:build_ai_art_workflow, []}
+      "data_viz" -> {:build_generation_workflow, []}
+      "ux_designer" -> {:build_generation_workflow, []}
+      _ -> {:build_generation_workflow, []}
+    end
+  end
 end

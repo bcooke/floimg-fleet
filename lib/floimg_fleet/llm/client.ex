@@ -174,7 +174,7 @@ defmodule FloimgFleet.LLM.Client do
       if Enum.empty?(example_prompts) do
         ""
       else
-        examples = example_prompts |> Enum.take(2) |> Enum.join("\n- ")
+        examples = example_prompts |> Enum.shuffle() |> Enum.take(4) |> Enum.join("\n- ")
         "Here are examples of prompts in your style:\n- #{examples}"
       end
 
@@ -186,9 +186,10 @@ defmodule FloimgFleet.LLM.Client do
 
     #{examples_text}
 
-    Generate a DALL-E prompt for an image you would create.
-    The prompt should be detailed (30-60 words) and match your personality and interests.
-    Include style, lighting, composition, and mood descriptors.
+    Generate a DALL-E prompt for a VISUALLY STUNNING image you would create.
+    The image should be gallery-worthy and impressive - something that makes people stop scrolling.
+    The prompt should be detailed (40-80 words) and match your personality and interests.
+    Include style, lighting, composition, mood, and quality descriptors like "masterpiece", "stunning", "award-winning", "hyperdetailed".
     Output ONLY the prompt text, nothing else.
     """
   end

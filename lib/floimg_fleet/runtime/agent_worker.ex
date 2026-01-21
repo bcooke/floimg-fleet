@@ -299,8 +299,8 @@ defmodule FloimgFleet.Runtime.AgentWorker do
     prompt = get_workflow_prompt(agent)
 
     if prompt do
-      # Build and execute the workflow
-      steps = FloImgAPI.build_generation_workflow(prompt, model: "dall-e-3", quality: "standard")
+      # Build persona-specific workflow to showcase FloImg capabilities
+      steps = build_persona_workflow(agent, prompt)
 
       case FloImgAPI.execute_workflow(agent, steps, "fleet-#{agent.persona_id}") do
         {:ok, %{"status" => "completed", "imageUrls" => [image_url | _]}} ->
@@ -337,6 +337,14 @@ defmodule FloimgFleet.Runtime.AgentWorker do
         # Fall back to persona template
         Seeds.get_random_prompt(agent.persona_id)
     end
+  end
+
+  # Build persona-specific workflow to showcase FloImg capabilities
+  defp build_persona_workflow(agent, prompt) do
+    alias FloimgFleet.FloImgAPI.Workflows
+
+    {builder, opts} = Workflows.workflow_for_persona(agent.persona_id)
+    apply(Workflows, builder, [prompt, opts])
   end
 
   # Fallback to placeholder image when workflow fails
