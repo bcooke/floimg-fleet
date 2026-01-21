@@ -239,6 +239,7 @@ defmodule FloimgFleet.Seeds do
     username = "#{persona["username_prefix"]}#{String.downcase(adj)}_#{index}"
 
     probabilities = persona["probabilities"]
+    activity_tier = persona["activity_tier"] || %{}
 
     %{
       name: name,
@@ -249,7 +250,9 @@ defmodule FloimgFleet.Seeds do
       interests: persona["interests"],
       post_probability: probabilities["post"],
       comment_probability: probabilities["comment"],
-      like_probability: probabilities["like"]
+      like_probability: probabilities["like"],
+      min_action_interval_seconds: activity_tier["min_action_interval_seconds"] || 60,
+      max_action_interval_seconds: activity_tier["max_action_interval_seconds"] || 300
     }
   end
 

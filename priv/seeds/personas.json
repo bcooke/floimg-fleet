@@ -20,11 +20,11 @@
         "Pro tip: Always shoot at the highest resolution, then batch resize for different platforms."
       ],
       "prompt_templates": [
-        "Professional product photography of a minimalist luxury perfume bottle on white background, soft studio lighting, commercial quality, 8k resolution",
-        "E-commerce product shot of premium wireless headphones floating on gradient background, dramatic shadows, clean composition",
-        "Hero shot of artisanal coffee beans spilling from a kraft paper bag, warm studio lighting, lifestyle product photography",
-        "Sleek smartwatch on marble surface with soft reflections, editorial product photography, Apple-style aesthetic",
-        "Premium skincare products arranged in a flatlay composition, clean white background, beauty product photography"
+        "Stunning luxury perfume bottle photography with dramatic rim lighting, deep black background, golden reflections, ultra-premium aesthetic, award-winning commercial photography",
+        "Breathtaking floating headphones product shot with vibrant gradient backdrop, dramatic shadows and highlights, Apple-quality editorial photography, hyperrealistic",
+        "Beautiful artisanal coffee scene with beans cascading from kraft bag, warm golden hour lighting, steam wisps, lifestyle photography masterpiece",
+        "Sleek smartwatch on polished obsidian surface with perfect reflections, moody dramatic lighting, high-end editorial quality, magazine cover worthy",
+        "Luxurious skincare flatlay with marble and gold accents, soft diffused lighting, premium beauty photography, Vogue-quality composition"
       ],
       "activity_schedule": {
         "peak_hours": [[9, 12], [13, 17]],
@@ -32,6 +32,11 @@
         "timezone": "America/New_York",
         "peak_multiplier": 2.0,
         "off_peak_multiplier": 0.3
+      },
+      "activity_tier": {
+        "tier": "regular",
+        "min_action_interval_seconds": 60,
+        "max_action_interval_seconds": 300
       },
       "weight": 1.5
     },
@@ -55,11 +60,11 @@
         "Testing new {adj} filter combinations. The algorithm loves consistency!"
       ],
       "prompt_templates": [
-        "Vibrant Instagram story design with bold typography saying 'NEW DROP', trendy gradient background, Gen-Z aesthetic, social media ready",
-        "Eye-catching TikTok thumbnail with neon accents, dynamic composition, influencer style, high engagement potential",
-        "Aesthetic mood board collage with pastel colors, minimalist design, Pinterest-worthy, lifestyle branding",
-        "Bold social media announcement graphic with confetti and celebration elements, brand launch vibes, viral potential",
-        "Trendy quote graphic with modern sans-serif font on textured background, shareable content, instagram carousel style"
+        "Stunning neon gradient social media graphic with electric purple and teal, bold 3D typography, futuristic Gen-Z aesthetic, ultra-vibrant colors",
+        "Vibrant TikTok thumbnail with holographic neon accents, dynamic diagonal composition, trending influencer aesthetic, scroll-stopping design",
+        "Dreamy pastel mood board with soft gradients, minimalist typography, aesthetic lifestyle branding, Pinterest-viral quality",
+        "Explosive celebration graphic with gold confetti, vibrant gradient background, premium brand launch energy, visually stunning",
+        "Bold quote graphic with dramatic lighting effects, modern kinetic typography, textured gradient background, shareable masterpiece"
       ],
       "activity_schedule": {
         "peak_hours": [[7, 9], [12, 14], [18, 22]],
@@ -67,6 +72,11 @@
         "timezone": "America/Los_Angeles",
         "peak_multiplier": 2.5,
         "off_peak_multiplier": 0.5
+      },
+      "activity_tier": {
+        "tier": "power",
+        "min_action_interval_seconds": 30,
+        "max_action_interval_seconds": 90
       },
       "weight": 1.3
     },
@@ -90,11 +100,11 @@
         "Experimenting with limited color palettes. Constraints breed creativity!"
       ],
       "prompt_templates": [
-        "Pixel art character sprite sheet for a retro platformer game, 16-bit style, idle and walking animations, vibrant limited color palette",
-        "Fantasy RPG tileset with grass, stone paths, and water tiles, top-down perspective, SNES-era aesthetic, seamless pattern",
-        "Cute pixel art monster designs for indie roguelike, 32x32 sprites, expressive animations, colorful but coherent palette",
-        "Retro game item icons including sword, potion, and treasure chest, pixel perfect, classic JRPG style",
-        "Pixel art game background of a magical forest at sunset, parallax layers, nostalgic 16-bit era vibes"
+        "Stunning pixel art hero character with flowing cape, vibrant limited palette, detailed shading, professional indie game quality, animation-ready sprite",
+        "Beautiful fantasy RPG village tileset with lush grass, sparkling water, cozy cottages, masterful top-down SNES aesthetic, rich details",
+        "Adorable pixel art slime monster with expressive bounce animation, cute but menacing, vibrant colors, indie game mascot quality",
+        "Epic pixel art treasure chest overflowing with gold and gems, glowing magical effects, JRPG masterpiece quality",
+        "Gorgeous pixel art magical forest at golden hour, layered parallax depth, ethereal lighting, nostalgic 16-bit masterpiece, wallpaper-worthy"
       ],
       "activity_schedule": {
         "peak_hours": [[18, 24], [0, 2]],
@@ -102,6 +112,11 @@
         "timezone": "America/Chicago",
         "peak_multiplier": 3.0,
         "off_peak_multiplier": 0.4
+      },
+      "activity_tier": {
+        "tier": "regular",
+        "min_action_interval_seconds": 60,
+        "max_action_interval_seconds": 300
       },
       "weight": 1.0
     },
@@ -125,11 +140,11 @@
         "Working on infographics today. {adj} visualizations make data accessible."
       ],
       "prompt_templates": [
-        "Clean infographic showing startup growth metrics, minimalist design, professional color scheme, executive summary style",
-        "Data visualization dashboard mockup with multiple chart types, dark mode aesthetic, modern SaaS design",
-        "Beautiful statistical chart showing climate data trends, scientific visualization, publication quality",
-        "Isometric infographic explaining a complex process with icons and flow arrows, corporate presentation style",
-        "Annual report cover design with abstract data visualization elements, premium business aesthetic"
+        "Stunning 3D infographic with floating data elements, vibrant gradient background, modern startup aesthetic, award-winning visualization design",
+        "Beautiful dark mode data dashboard with glowing neon charts, sleek SaaS design, futuristic analytics aesthetic, magazine-quality",
+        "Elegant scientific visualization with flowing data streams, cool blue color palette, publication-worthy quality, visually captivating",
+        "Striking isometric process diagram with colorful icons, dynamic flow arrows, premium corporate design, presentation masterpiece",
+        "Luxurious annual report cover with abstract geometric data art, gold and navy color scheme, Fortune 500 aesthetic"
       ],
       "activity_schedule": {
         "peak_hours": [[8, 12], [14, 18]],
@@ -137,6 +152,11 @@
         "timezone": "Europe/London",
         "peak_multiplier": 2.0,
         "off_peak_multiplier": 0.2
+      },
+      "activity_tier": {
+        "tier": "casual",
+        "min_action_interval_seconds": 300,
+        "max_action_interval_seconds": 900
       },
       "weight": 0.8
     },
@@ -160,11 +180,11 @@
         "Upscaled this 4x and the details that emerged are incredible. AI never stops surprising me."
       ],
       "prompt_templates": [
-        "Surreal dreamscape with floating islands and bioluminescent creatures, hyperdetailed fantasy art, ethereal lighting, otherworldly atmosphere",
-        "Cyberpunk cityscape at night with neon reflections in rain puddles, Blade Runner aesthetic, cinematic composition, moody atmosphere",
-        "Abstract cosmic entity made of swirling galaxies and stardust, deep space art, vibrant nebula colors, awe-inspiring scale",
-        "Baroque still life reimagined in futuristic style, AI fusion art, classical meets sci-fi, dramatic chiaroscuro lighting",
-        "Mystical forest spirit emerging from ancient trees, fantasy creature design, magical realism, Studio Ghibli inspired atmosphere"
+        "Award-winning surreal dreamscape with crystalline floating islands, bioluminescent creatures, ethereal volumetric lighting, ultra-detailed fantasy masterpiece, ArtStation trending",
+        "Stunning cyberpunk cityscape at golden hour, neon reflections in rain puddles, cinematic Blade Runner aesthetic, volumetric fog, hyperdetailed 8K",
+        "Breathtaking cosmic entity made of colliding galaxies and stardust, deep space majesty, vibrant nebula colors, NASA-quality visualization, awe-inspiring",
+        "Masterful baroque still life reimagined with cyberpunk elements, dramatic chiaroscuro lighting, classical meets sci-fi fusion, museum-quality digital art",
+        "Enchanting forest spirit emerging from ancient sakura trees, Studio Ghibli meets fine art, magical realism, ethereal atmosphere, visually stunning"
       ],
       "activity_schedule": {
         "peak_hours": [[20, 24], [0, 4]],
@@ -172,6 +192,11 @@
         "timezone": "UTC",
         "peak_multiplier": 2.0,
         "off_peak_multiplier": 0.7
+      },
+      "activity_tier": {
+        "tier": "power",
+        "min_action_interval_seconds": 30,
+        "max_action_interval_seconds": 90
       },
       "weight": 1.2
     },
@@ -195,11 +220,11 @@
         "Annotated some {adj} wireframes today. Visual specs save engineering time."
       ],
       "prompt_templates": [
-        "Clean mobile app UI design for a fitness tracking app, modern material design, dark mode interface, professional mockup",
-        "SaaS dashboard interface with analytics widgets, minimalist design system, Figma-style presentation, light theme",
-        "E-commerce checkout flow wireframe with annotations, user journey mapping, UX documentation style",
-        "Design system component library showcase with buttons, cards, and forms, organized grid layout, documentation quality",
-        "Mobile onboarding screens with friendly illustrations, progressive disclosure pattern, welcoming user experience"
+        "Stunning dark mode fitness app UI with vibrant accent colors, glassmorphism effects, premium mobile design, Dribbble-worthy mockup",
+        "Beautiful SaaS dashboard with glowing analytics widgets, modern gradient accents, sleek dark theme, award-winning UI design",
+        "Elegant e-commerce checkout flow with smooth animations, premium user experience, Apple-quality design aesthetic, visually polished",
+        "Stunning design system showcase with colorful components, organized Bento grid layout, modern documentation aesthetic, visually impressive",
+        "Delightful mobile onboarding with vibrant illustrations, friendly character mascots, engaging micro-interactions, premium app quality"
       ],
       "activity_schedule": {
         "peak_hours": [[9, 12], [14, 18]],
@@ -207,6 +232,11 @@
         "timezone": "America/Los_Angeles",
         "peak_multiplier": 2.0,
         "off_peak_multiplier": 0.3
+      },
+      "activity_tier": {
+        "tier": "regular",
+        "min_action_interval_seconds": 60,
+        "max_action_interval_seconds": 300
       },
       "weight": 1.0
     }
