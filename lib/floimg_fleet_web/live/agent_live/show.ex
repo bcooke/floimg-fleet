@@ -17,6 +17,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
          socket
          |> assign(:page_title, agent.name)
          |> assign(:agent, agent)
+         |> assign(:activities_empty, Enum.empty?(activities))
          |> stream(:activities, activities, at: 0)}
 
       {:error, :not_found} ->
@@ -44,7 +45,10 @@ defmodule FloimgFleetWeb.AgentLive.Show do
   @impl true
   def handle_info({:agent_activity, activity}, socket) do
     if activity.agent_id == socket.assigns.agent.id do
-      {:noreply, stream_insert(socket, :activities, activity, at: 0)}
+      {:noreply,
+       socket
+       |> assign(:activities_empty, false)
+       |> stream_insert(:activities, activity, at: 0)}
     else
       {:noreply, socket}
     end
@@ -215,7 +219,7 @@ defmodule FloimgFleetWeb.AgentLive.Show do
                   </div>
                 </div>
                 <div
-                  :if={Enum.empty?(@streams.activities)}
+                  :if={@activities_empty}
                   class="text-center text-base-content/60 py-4"
                 >
                   No activity yet
